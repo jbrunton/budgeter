@@ -7,8 +7,10 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
       t.decimal :value
       t.decimal :balance
       t.string :category
+      t.string :hash
 
       t.timestamps
     end
+    add_index :transactions, :hash
   end
 end
