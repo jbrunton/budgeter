@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Pending Transactions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Type</th>
+      <th>Description</th>
+      <th>Value</th>
+      <th>Balance</th>
+      <th>Category</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @transactions.each do |transaction| %>
+        <tr>
+          <td><%= transaction.date %></td>
+          <td><%= transaction.transaction_type %></td>
+          <td><%= transaction.description %></td>
+          <td><%= transaction.value %></td>
+          <td><%= transaction.balance %></td>
+          <td><%= transaction.category %></td>
+        </tr>
+    <% end %>
+  </tbody>
+</table>

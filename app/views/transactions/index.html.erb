@@ -19,7 +19,7 @@
     <% @transactions.each do |transaction| %>
       <tr>
         <td><%= transaction.date %></td>
-        <td><%= transaction.type %></td>
+        <td><%= transaction.transaction_type %></td>
         <td><%= transaction.description %></td>
         <td><%= transaction.value %></td>
         <td><%= transaction.balance %></td>

@@ -61,6 +61,14 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def sync
+    @transactions = []
+    @files = Dir.glob("#{Rails.root}/transactions/*.csv").each do |file|
+      puts "Found: #{file}"
+      @transactions += Parser.read(file).map{ |t| Transaction.new(t) }
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_transaction
