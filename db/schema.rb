@@ -14,15 +14,15 @@ ActiveRecord::Schema.define(version: 20171222110702) do
 
   create_table "transactions", force: :cascade do |t|
     t.date "date"
-    t.string "type"
+    t.string "transaction_type"
     t.string "description"
     t.decimal "value"
     t.decimal "balance"
     t.string "category"
-    t.string "hash"
+    t.string "sha"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["hash"], name: "index_transactions_on_hash"
+    t.index ["sha"], name: "index_transactions_on_sha"
   end
 
 end
