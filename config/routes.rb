@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :projects
   resources :transactions do
     collection do
       get 'sync', to: 'transactions#sync_confirm'
