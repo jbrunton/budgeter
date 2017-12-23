@@ -1,7 +1,12 @@
 Rails.application.routes.draw do
 
   resources :statements
-  resources :projects
+  resources :projects do
+    member do
+      get 'sync', to: 'sync#preview'
+      post 'sync', to: 'sync#sync'
+    end
+  end
   resources :transactions do
     collection do
       get 'sync', to: 'transactions#sync_confirm'
