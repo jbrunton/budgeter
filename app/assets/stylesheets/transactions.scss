@@ -5,6 +5,8 @@
 table.transactions {
   @extend .striped;
 
+  font-size: 90%;
+
   td, th {
     padding: 2px;
   }
@@ -14,20 +16,30 @@ table.transactions {
       width: 6%;
     }
 
-    &.date, &.value, &.balance, &.category {
-      width: 10%;
-    }
-
-    &.controls {
-      width: 14%;
+    &.date, &.value, &.balance {
+      width: 8%;
     }
 
     &.description {
-      width: 50%;
+      width: 40%;
+    }
+
+    &.category {
+      width: 15%;
+    }
+
+    &.controls {
+      width: 15%;
     }
   }
 
   td.numeric {
     text-align: right;
+  }
+
+  td input[type=text] {
+    height: 100%;
+    padding: 0;
+    margin: 2px;
   }
 }
