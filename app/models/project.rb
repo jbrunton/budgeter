@@ -8,4 +8,8 @@ class Project < ApplicationRecord
       statements.build(filename: File.basename(filename))
     end
   end
+
+  def categories
+    transactions.distinct.pluck(:category).compact
+  end
 end

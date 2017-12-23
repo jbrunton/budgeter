@@ -44,7 +44,7 @@ class TransactionsController < ApplicationController
     respond_to do |format|
       if @transaction.update(transaction_params)
         format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
-        format.json { render :show, status: :ok, location: @transaction }
+        format.json { render json: @project.categories, status: :ok }
       else
         format.html { render :edit }
         format.json { render json: @transaction.errors, status: :unprocessable_entity }
@@ -88,7 +88,7 @@ class TransactionsController < ApplicationController
     end
 
     def set_project
-      @project = @transaction.try(:id) || Project.find(params[:project_id])
+      @project = @transaction.try(:project) || Project.find(params[:project_id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

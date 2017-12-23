@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     member do
       get 'sync', to: 'sync#preview'
       post 'sync', to: 'sync#sync'
+      get 'categories'
     end
     resources :transactions, shallow: true
   end

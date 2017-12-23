@@ -4,10 +4,31 @@
 
 <script>
   $(function() {
-    $('.transactions form.category input').change(function() {
+    $('.transactions form.category input[type=text]').change(function() {
       var action = $(this).parent('form')[0].action + '.json';
       var data = $(this).parent('form').serialize();
-      $.post(action, data);
+      $.post(action, data, function(response) {
+        var autocompleteData = {};
+        response.forEach(function(val) {
+          autocompleteData[val] = null;
+        });
+        $('.transactions form.category input[type=text]').autocomplete({
+          data: autocompleteData,
+          limit: 20, // The max amount of results that can be shown at once. Default: Infinity.
+          onAutocomplete: function(val) {
+            // Callback function when value is autcompleted.
+          },
+          minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
+        });
+      });
+    });
+    $('.transactions form.category input[type=text]').autocomplete({
+      data: <%=json_escape @project.categories.map{ |c| [c, nil] }.to_h.to_json.html_safe %>,
+      limit: 20, // The max amount of results that can be shown at once. Default: Infinity.
+      onAutocomplete: function(val) {
+        // Callback function when value is autcompleted.
+      },
+      minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
     });
   });
 </script>
