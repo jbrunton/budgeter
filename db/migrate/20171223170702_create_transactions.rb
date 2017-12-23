@@ -7,12 +7,11 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
       t.decimal :value
       t.decimal :balance
       t.string :category
-      t.string :status
-      t.string :hash_code
+
+      t.references :project, foreign_key: true
 
       t.timestamps
     end
-    add_index :transactions, :hash_code, unique: true
     add_index :transactions, :status
   end
 end

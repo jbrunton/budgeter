@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171223164839) do
+ActiveRecord::Schema.define(version: 20171223170702) do
 
   create_table "projects", force: :cascade do |t|
     t.string "name"
@@ -37,12 +37,11 @@ ActiveRecord::Schema.define(version: 20171223164839) do
     t.decimal "value"
     t.decimal "balance"
     t.string "category"
-    t.string "status"
-    t.string "hash_code"
+    t.integer "project_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["hash_code"], name: "index_transactions_on_hash_code", unique: true
-    t.index ["status"], name: "index_transactions_on_status"
+    t.index ["project_id"], name: "index_transactions_on_project_id"
+    t.index [nil], name: "index_transactions_on_status"
   end
 
 end
