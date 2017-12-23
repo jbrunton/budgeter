@@ -21,7 +21,6 @@
       <th class="value">Value</th>
       <th class="balance">Balance</th>
       <th class="category">Category</th>
-      <th class="controls" colspan="3"></th>
     </tr>
   </thead>
 
@@ -38,8 +37,6 @@
             <%= form.text_field :category %>
           <% end %>
         </td>
-        <td><%= link_to 'Show', transaction %></td>
-        <td><%= link_to 'Edit', edit_transaction_path(transaction) %></td>
       </tr>
     <% end %>
   </tbody>
