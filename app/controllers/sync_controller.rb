@@ -35,7 +35,6 @@ class SyncController < ApplicationController
           end.to_h
         end
       }
-      byebug
       File.write(File.join(@project.directory, 'transactions', "#{key}.yaml"), content.to_yaml)
     end
 
