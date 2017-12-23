@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  filename: MyString
+  content: MyText
+  first_date: 2017-12-23
+  last_date: 2017-12-23
+  project: one
+
+two:
+  filename: MyString
+  content: MyText
+  first_date: 2017-12-23
+  last_date: 2017-12-23
+  project: two

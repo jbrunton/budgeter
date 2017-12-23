@@ -10,13 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171223150749) do
+ActiveRecord::Schema.define(version: 20171223164839) do
 
   create_table "projects", force: :cascade do |t|
     t.string "name"
     t.string "directory"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "statements", force: :cascade do |t|
+    t.string "filename"
+    t.text "content"
+    t.date "first_date"
+    t.date "last_date"
+    t.integer "project_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_statements_on_project_id"
   end
 
   create_table "transactions", force: :cascade do |t|
