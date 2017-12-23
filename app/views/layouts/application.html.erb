@@ -12,6 +12,22 @@
   </head>
 
   <body>
+
+    <nav class="nav-extended">
+      <div class="nav-wrapper container">
+        <a href="#" class="brand-logo">Logo</a>
+      </div>
+      <div class="nav-content container">
+        <% breadcrumbs do |links| %>
+            <% if links.any? %>
+                <% links.each do |link| %>
+                    <%= link_to link.text, link.url, class: 'breadcrumb' %>
+                <% end %>
+            <% end %>
+        <% end %>
+      </div>
+    </nav>
+
     <div class="container">
       <%= yield %>
     </div>
