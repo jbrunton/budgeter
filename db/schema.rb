@@ -19,10 +19,12 @@ ActiveRecord::Schema.define(version: 20171222110702) do
     t.decimal "value"
     t.decimal "balance"
     t.string "category"
-    t.string "sha"
+    t.string "status"
+    t.string "hash_code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["sha"], name: "index_transactions_on_sha"
+    t.index ["hash_code"], name: "index_transactions_on_hash_code", unique: true
+    t.index ["status"], name: "index_transactions_on_status"
   end
 
 end

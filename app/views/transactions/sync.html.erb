@@ -1,21 +1,55 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Pending Transactions</h1>
+<h1>Sync complete</h1>
 
-<table>
+<p>
+  Synced <%= @saved_transactions.count %> transactions
+</p>
+
+<table class="transactions">
   <thead>
     <tr>
-      <th>Date</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Value</th>
-      <th>Balance</th>
-      <th>Category</th>
+      <th class="date">Date</th>
+      <th class="transaction_type">Type</th>
+      <th class="description">Description</th>
+      <th class="value">Value</th>
+      <th class="balance">Balance</th>
+      <th class="category">Category</th>
     </tr>
   </thead>
 
   <tbody>
-    <% @transactions.each do |transaction| %>
+    <% @saved_transactions.each do |transaction| %>
+        <tr>
+          <td><%= transaction.date %></td>
+          <td><%= transaction.transaction_type %></td>
+          <td><%= transaction.description %></td>
+          <td><%= transaction.value %></td>
+          <td><%= transaction.balance %></td>
+          <td><%= transaction.category %></td>
+        </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<p>
+  Unable to sync <%= @saved_transactions.count %> transactions
+</p>
+
+<table class="transactions">
+  <thead>
+    <tr>
+      <th class="date">Date</th>
+      <th class="transaction_type">Type</th>
+      <th class="description">Description</th>
+      <th class="value">Value</th>
+      <th class="balance">Balance</th>
+      <th class="category">Category</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @duplicate_transactions.each do |transaction| %>
         <tr>
           <td><%= transaction.date %></td>
           <td><%= transaction.transaction_type %></td>

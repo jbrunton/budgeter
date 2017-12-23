@@ -61,11 +61,22 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def sync_confirm
+    @transactions = Transaction.pending
+  end
+
   def sync
-    @transactions = []
-    @files = Dir.glob("#{Rails.root}/transactions/*.csv").each do |file|
-      puts "Found: #{file}"
-      @transactions += Parser.read(file).map{ |t| Transaction.new(t) }
+    @pending_transactions = Transaction.pending
+    @duplicate_transactions = []
+    @saved_transactions = []
+    @pending_transactions.each do |t|
+      begin
+        t.status = if t.category.nil? then :unclassified else :training end
+        t.save
+        @saved_transactions << t
+      rescue ActiveRecord::RecordNotUnique => e
+        @duplicate_transactions << t
+      end
     end
   end
 

@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Pending Transactions</h1>
+
+<%= button_to 'Sync', 'sync', { class: 'btn waves-effect waves-light'} %>
+
+<p>
+  <%= @transactions.count %> pending transactions
+</p>
+
+<table class="transactions">
+  <thead>
+    <tr>
+      <th class="date">Date</th>
+      <th class="transaction_type">Type</th>
+      <th class="description">Description</th>
+      <th class="value">Value</th>
+      <th class="balance">Balance</th>
+      <th class="category">Category</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @transactions.each do |transaction| %>
+        <tr>
+          <td><%= transaction.date %></td>
+          <td><%= transaction.transaction_type %></td>
+          <td><%= transaction.description %></td>
+          <td><%= transaction.value %></td>
+          <td><%= transaction.balance %></td>
+          <td><%= transaction.category %></td>
+        </tr>
+    <% end %>
+  </tbody>
+</table>
