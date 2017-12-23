@@ -13,7 +13,7 @@ class Parser
         transaction_type: row[header_map['Type']],
         description: row[header_map['Description']],
         value: row[header_map['Value']],
-        category: row[header_map['Category']]
+        balance: row[header_map['Balance']]
       }
     end
   end

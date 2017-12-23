@@ -1,10 +1,11 @@
 class TransactionsController < ApplicationController
   before_action :set_transaction, only: [:show, :edit, :update, :destroy]
+  before_action :set_project
 
   # GET /transactions
   # GET /transactions.json
   def index
-    @transactions = Transaction.all
+    @transactions = @project.transactions
   end
 
   # GET /transactions/1
@@ -84,6 +85,10 @@ class TransactionsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_transaction
       @transaction = Transaction.find(params[:id])
+    end
+
+    def set_project
+      @project = @transaction.try(:id) || Project.find(params[:project_id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

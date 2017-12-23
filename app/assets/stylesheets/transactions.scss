@@ -10,12 +10,24 @@ table.transactions {
   }
 
   th {
-    &.date, &.transaction_type, &.value, &.balance, &.category {
+    &.transaction_type {
+      width: 6%;
+    }
+
+    &.date, &.value, &.balance, &.category {
       width: 10%;
+    }
+
+    &.controls {
+      width: 14%;
     }
 
     &.description {
       width: 50%;
     }
+  }
+
+  td.numeric {
+    text-align: right;
   }
 }

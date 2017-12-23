@@ -2,16 +2,16 @@
 
 <h1>Transactions</h1>
 
-<table>
+<table class="transactions">
   <thead>
     <tr>
-      <th>Date</th>
-      <th>Type</th>
-      <th>Description</th>
-      <th>Value</th>
-      <th>Balance</th>
-      <th>Category</th>
-      <th colspan="3"></th>
+      <th class="date">Date</th>
+      <th class="transaction_type">Type</th>
+      <th class="description">Description</th>
+      <th class="value">Value</th>
+      <th class="balance">Balance</th>
+      <th class="category">Category</th>
+      <th class="controls" colspan="3"></th>
     </tr>
   </thead>
 
@@ -21,12 +21,11 @@
         <td><%= transaction.date %></td>
         <td><%= transaction.transaction_type %></td>
         <td><%= transaction.description %></td>
-        <td><%= transaction.value %></td>
-        <td><%= transaction.balance %></td>
+        <td class="numeric"><%= currency transaction.value %></td>
+        <td class="numeric"><%= currency transaction.balance %></td>
         <td><%= transaction.category %></td>
         <td><%= link_to 'Show', transaction %></td>
         <td><%= link_to 'Edit', edit_transaction_path(transaction) %></td>
-        <td><%= link_to 'Destroy', transaction, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
@@ -34,4 +33,4 @@
 
 <br>
 
-<%= link_to 'New Transaction', new_transaction_path %>
+<%= link_to 'New Transaction', new_project_transaction_path(@project) %>

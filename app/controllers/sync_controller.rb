@@ -5,6 +5,18 @@ class SyncController < ApplicationController
     @statements = @project.scan
   end
 
+  def sync
+    @project.transactions.delete_all
+    @statements = @project.scan
+    @statements.each do |statement|
+      statement.scan.each do |transaction|
+        transaction.save
+      end
+    end
+
+    redirect_to project_transactions_path(@project)
+  end
+
 private
   def set_project
     @project = Project.find(params[:id])
