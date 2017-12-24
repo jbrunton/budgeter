@@ -5,9 +5,9 @@
 <% if defined? @score %>
     <h4>Score: <%= @score %>%</h4>
 <% end %>
-<h4>Test Transactions</h4>
+<h4>Test Transactions (<%= @test_transactions.count %>)</h4>
 <%= render partial: 'shared/transactions_table', locals: { transactions: @test_transactions } %>
 
-<h4>Training Transactions</h4>
+<h4>Training Transactions (<%= @training_transactions.count %>)</h4>
 <%= render partial: 'shared/transactions_table', locals: { transactions: @training_transactions } %>
 

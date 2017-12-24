@@ -2,17 +2,17 @@ class TrainingController < ApplicationController
   before_action :set_project, only: [:preview, :train]
 
   def preview
-    categorised_transactions = @project.transactions.select{ |t| !t.category.nil? }
-    @training_transactions = categorised_transactions.each_with_index.select{ |_, i| i % 3 != 0 }.map{ |t, _| t }
-    @test_transactions = categorised_transactions.each_with_index.select{ |_, i| i % 3 == 0 }.map{ |t, _| t }
+    partition = partition_transactions
+    @test_transactions = partition[:test_transactions]
+    @training_transactions = partition[:training_transactions]
 
     render 'train'
   end
 
   def train
-    categorised_transactions = @project.transactions.select{ |t| !t.category.nil? }
-    @training_transactions = categorised_transactions.each_with_index.select{ |_, i| i % 3 != 0 }.map{ |t, _| t }
-    @test_transactions = categorised_transactions.each_with_index.select{ |_, i| i % 3 == 0 }.map{ |t, _| t }
+    partition = partition_transactions
+    @test_transactions = partition[:test_transactions]
+    @training_transactions = partition[:training_transactions]
 
     classifier = StuffClassifier::Bayes.new('Transaction Classifier')
     @training_transactions.each do |t|
@@ -31,5 +31,28 @@ class TrainingController < ApplicationController
 private
   def set_project
     @project = Project.find(params[:id])
+  end
+
+  def partition_transactions
+    categorised_transactions = @project.transactions.select{ |t| !t.category.nil? }
+    transactions_by_category = categorised_transactions.group_by{ |t| t.category }
+    training_transactions = []
+    test_transactions = []
+    transactions_by_category.each do |_, ts|
+      head, *tail = ts
+      training_transactions << head
+      test_transactions.concat tail
+    end
+
+    test_transactions.shuffle!
+    target_test_size = (categorised_transactions.count * 0.3)
+    while test_transactions.size > target_test_size + 1
+      training_transactions << test_transactions.pop
+    end
+
+    {
+      test_transactions: test_transactions,
+      training_transactions: training_transactions
+    }
   end
 end
