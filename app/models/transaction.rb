@@ -3,6 +3,8 @@ require 'digest'
 class Transaction < ApplicationRecord
   belongs_to :project
 
+  default_scope { order(:date, :statement_name, :statement_index) }
+
   DATA_ATTRIBUTES = [
     'date',
     'transaction_type',
