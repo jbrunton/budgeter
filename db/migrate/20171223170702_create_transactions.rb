@@ -10,6 +10,7 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
       t.string :statement_name
       t.integer :statement_index
       t.string :category
+      t.string :predicted_category
 
       t.references :project, foreign_key: true
 

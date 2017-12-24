@@ -7,6 +7,7 @@
       <th class="value">Value</th>
       <th class="balance">Balance</th>
       <th class="category">Category</th>
+      <th class="predicted_category">Prediction</th>
     </tr>
   </thead>
 
@@ -19,6 +20,7 @@
           <td class="numeric"><%= currency transaction.value %></td>
           <td class="numeric"><%= currency transaction.balance %></td>
           <td><%= transaction.category %></td>
+          <td><%= transaction.predicted_category %></td>
         </tr>
     <% end %>
   </tbody>

@@ -9,6 +9,9 @@ Rails.application.routes.draw do
       get 'import', to: 'import#preview', as: 'preview_import'
       post 'import', to: 'import#import'
 
+      get 'train', to: 'training#preview', as: 'preview_training'
+      post 'train', to: 'training#train'
+
       get 'categories'
     end
     resources :transactions, shallow: true

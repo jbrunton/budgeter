@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(version: 20171223170702) do
     t.string "statement_name"
     t.integer "statement_index"
     t.string "category"
+    t.string "predicted_category"
     t.integer "project_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
