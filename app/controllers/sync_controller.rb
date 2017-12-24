@@ -1,13 +1,15 @@
 require 'fileutils'
+require 'yaml'
 
 class SyncController < ApplicationController
   include ApplicationHelper
 
-  FILE_ATTRIBUTES = ['date', 'transaction_type', 'description', 'value', 'balance']
+  CURRENCY_ATTRIBUTES = ['value', 'balance']
+
   before_action :set_project, only: [:preview, :sync]
 
   def preview
-    @statements = @project.scan
+    @statements = @project.scan_statements
   end
 
   def sync
@@ -25,15 +27,7 @@ class SyncController < ApplicationController
 
     @project.transactions.group_by{ |t| t.date.strftime('%Y-%m-%b') }.each do |key, transactions|
       content = {
-        transactions: transactions.map do |t|
-          t.attributes.slice(*FILE_ATTRIBUTES).map do |attr_name, attr_val|
-            if ['value', 'balance'].include?(attr_name)
-              [attr_name, currency(attr_val)]
-            else
-              [attr_name, attr_val]
-            end
-          end.to_h
-        end
+        'transactions' => transactions.map { |t| marshal_for_file(t) }.to_h
       }
       File.write(File.join(@project.directory, 'transactions', "#{key}.yaml"), content.to_yaml)
     end
@@ -44,5 +38,15 @@ class SyncController < ApplicationController
 private
   def set_project
     @project = Project.find(params[:id])
+  end
+
+  def marshal_for_file(transaction)
+    transaction.data_attributes.map do |attr_name, attr_val|
+      if CURRENCY_ATTRIBUTES.include?(attr_name)
+        [attr_name, currency(attr_val)]
+      else
+        [attr_name, attr_val]
+      end
+    end.to_h
   end
 end
