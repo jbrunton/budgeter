@@ -5,7 +5,7 @@ class Project < ApplicationRecord
   def scan_statements
     scan_dir = File.join(directory, 'statements')
     Dir.glob("#{scan_dir}/*.csv").map do |filename|
-      statements.build(filename: File.basename(filename))
+      Statement.new(self, File.basename(filename))
     end
   end
 

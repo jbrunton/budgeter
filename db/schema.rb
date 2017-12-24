@@ -19,23 +19,16 @@ ActiveRecord::Schema.define(version: 20171223170702) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "statements", force: :cascade do |t|
-    t.string "filename"
-    t.text "content"
-    t.date "first_date"
-    t.date "last_date"
-    t.integer "project_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["project_id"], name: "index_statements_on_project_id"
-  end
-
   create_table "transactions", force: :cascade do |t|
     t.date "date"
     t.string "transaction_type"
     t.string "description"
     t.decimal "value"
     t.decimal "balance"
+    t.string "statement_name"
+    t.integer "statement_index"
+    t.string "store_name"
+    t.integer "store_index"
     t.string "category"
     t.integer "project_id"
     t.datetime "created_at", null: false
