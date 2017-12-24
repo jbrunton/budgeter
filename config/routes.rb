@@ -5,6 +5,10 @@ Rails.application.routes.draw do
     member do
       get 'sync', to: 'sync#preview', as: 'preview_sync'
       post 'sync', to: 'sync#sync'
+
+      get 'import', to: 'import#preview', as: 'preview_import'
+      post 'import', to: 'import#import'
+
       get 'categories'
     end
     resources :transactions, shallow: true
