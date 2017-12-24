@@ -2,10 +2,32 @@
 
 <%= button_to 'Sync', 'sync', { class: 'btn waves-effect waves-light'} %>
 
-<ul>
-  <% @statements.each do |statement| %>
-    <li>
-      <%= statement.filename %>
-    </li>
-  <% end %>
+<ul class="collapsible" data-collapsible="expandable">
+  <li>
+    <div class="collapsible-header active">
+      <i class="material-icons">filter_drama</i>
+      New Transactions (<%= @new_transactions.count %>)
+    </div>
+    <div class="collapsible-body">
+      <%= render partial: 'shared/transactions_table', locals: { transactions: @new_transactions } %>
+    </div>
+  </li>
+  <li>
+    <div class="collapsible-header active">
+      <i class="material-icons">place</i>
+      Orphaned Transactions (<%= @orphaned_transactions.count %>)
+    </div>
+    <div class="collapsible-body">
+      <%= render partial: 'shared/transactions_table', locals: { transactions: @orphaned_transactions } %>
+    </div>
+  </li>
+  <li>
+    <div class="collapsible-header">
+      <i class="material-icons">whatshot</i>
+      Synced Transactions (<%= @synced_transactions.count %>)
+    </div>
+    <div class="collapsible-body">
+      <%= render partial: 'shared/transactions_table', locals: { transactions: @synced_transactions } %>
+    </div>
+  </li>
 </ul>

@@ -7,7 +7,23 @@ class SyncController < ApplicationController
   before_action :set_project, only: [:preview, :sync]
 
   def preview
-    @statements = @project.scan_statements
+    stored_transactions = @project.transactions.to_a
+    statement_transactions = @project.scan_statement_transactions
+
+    @new_transactions = []
+    @orphaned_transactions = stored_transactions.clone
+    @synced_transactions = []
+
+    statement_transactions.each do |candidate|
+      store_index = stored_transactions.index{ |t| t.data_attributes == candidate.data_attributes }
+      orphan_index = @orphaned_transactions.index{ |t| t.data_attributes == candidate.data_attributes }
+      if store_index.nil?
+        @new_transactions << candidate
+      else
+        @orphaned_transactions.delete_at(orphan_index)
+        @synced_transactions << candidate
+      end
+    end
   end
 
   def sync
@@ -25,12 +41,7 @@ class SyncController < ApplicationController
 
     @project.transactions.group_by{ |t| t.date.strftime('%Y-%m-%b') }.each do |filename, transactions|
       content = {
-        'transactions' => transactions.each_with_index.map do |transaction, index|
-          transaction.store_name = "#{filename}.yaml"
-          transaction.store_index = index
-          transaction.save
-          marshal_for_file(transaction)
-        end
+        'transactions' => transactions.map { |transaction| marshal_for_file(transaction) }
       }
       File.write(File.join(@project.directory, 'transactions', "#{filename}.yaml"), content.to_yaml)
     end

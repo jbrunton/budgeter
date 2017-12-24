@@ -2,11 +2,12 @@ class Project < ApplicationRecord
   has_many :transactions
   has_many :statements
 
-  def scan_statements
+  def scan_statement_transactions
     scan_dir = File.join(directory, 'statements')
-    Dir.glob("#{scan_dir}/*.csv").map do |filename|
+    statements = Dir.glob("#{scan_dir}/*.csv").map do |filename|
       Statement.new(self, File.basename(filename))
     end
+    statements.map{ |statement| statement.scan_transactions }.flatten
   end
 
   def scan_stored_transactions

@@ -27,8 +27,6 @@ ActiveRecord::Schema.define(version: 20171223170702) do
     t.decimal "balance"
     t.string "statement_name"
     t.integer "statement_index"
-    t.string "store_name"
-    t.integer "store_index"
     t.string "category"
     t.integer "project_id"
     t.datetime "created_at", null: false
