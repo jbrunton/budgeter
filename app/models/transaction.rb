@@ -22,4 +22,14 @@ class Transaction < ApplicationRecord
   def data_attributes
     attributes.slice(*DATA_ATTRIBUTES)
   end
+
+  def assess_prediction
+    if predicted_category.nil?
+      :no_prediction
+    elsif category == predicted_category
+      :correct
+    else
+      :incorrect
+    end
+  end
 end

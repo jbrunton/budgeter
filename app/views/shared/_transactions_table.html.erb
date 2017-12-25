@@ -13,7 +13,7 @@
 
   <tbody>
     <% transactions.each do |transaction| %>
-        <tr>
+        <tr class="<%= transaction.assess_prediction %>">
           <td><%= transaction.date %></td>
           <td><%= transaction.transaction_type %></td>
           <td><%= transaction.description %></td>

@@ -7,15 +7,19 @@
 }
 
 table.transactions {
-  @extend .striped;
-
-  margin-left: -5%;
-  width: 110%;
-
   font-size: 90%;
 
   td, th {
     padding: 2px;
+  }
+
+  tr {
+    &.correct {
+      @extend .green, .lighten-5;
+    }
+    &.incorrect {
+      @extend .red, .lighten-5;
+    }
   }
 
   th {
