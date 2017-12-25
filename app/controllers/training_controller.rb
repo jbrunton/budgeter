@@ -3,17 +3,9 @@ class TrainingController < ApplicationController
   before_action :set_random_seed
 
   def train
-    partition = partition_transactions
-    @test_transactions = partition[:test_transactions]
-    @training_transactions = partition[:training_transactions]
-
-    render 'train'
   end
 
-  def update
-    @project.ignore_words = params[:ignore_words]
-    @project.save
-
+  def preview
     partition = partition_transactions
     @test_transactions = partition[:test_transactions]
     @training_transactions = partition[:training_transactions]
@@ -30,7 +22,29 @@ class TrainingController < ApplicationController
 
     @score = (@test_transactions.select{ |t| t.predicted_category == t.category }.count.to_f * 100 / @test_transactions.count).round
 
-    render 'train'
+    render layout: false
+  end
+
+  def classify
+    @project.ignore_words = params[:ignore_words]
+    @project.save
+
+    partition = partition_transactions
+    @test_transactions = partition[:test_transactions]
+    @training_transactions = partition[:training_transactions]
+
+    classifier = StuffClassifier::Bayes.new('Transaction Classifier')
+    classifier.ignore_words = @project.ignore_words.split(',').map{ |s| s.chomp }
+    @training_transactions.each do |t|
+      classifier.train(t.category, t.description)
+    end
+
+    @project.transactions.each do |t|
+      t.predicted_category = classifier.classify(t.description)
+      t.save
+    end
+
+    redirect_to project_transactions_path(@project), notice: 'Transactions classified.'
   end
 
 private

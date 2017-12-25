@@ -9,7 +9,8 @@ Rails.application.routes.draw do
       post 'backup/restore', to: 'backup#restore'
 
       get 'train', to: 'training#train'
-      post 'train', to: 'training#update'
+      get 'preview', to: 'training#preview', as: 'training_preview'
+      post 'classify', to: 'training#classify'
 
       get 'categories'
     end
