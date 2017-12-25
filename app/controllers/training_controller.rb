@@ -1,6 +1,6 @@
 class TrainingController < ApplicationController
-  before_action :set_project, only: [:preview, :train]
-  before_action :set_random_seed, only: [:preview, :train]
+  before_action :set_project
+  before_action :set_random_seed
 
   def train
     partition = partition_transactions
