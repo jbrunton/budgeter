@@ -7,8 +7,6 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
       t.decimal :value
       t.decimal :balance
 
-      t.string :statement_name
-      t.integer :statement_index
       t.string :category
       t.string :predicted_category
 

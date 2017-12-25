@@ -10,9 +10,7 @@ class Transaction < ApplicationRecord
     'transaction_type',
     'description',
     'value',
-    'balance',
-    'statement_name',
-    'statement_index'
+    'balance'
   ]
 
   def to_s

@@ -26,8 +26,6 @@ ActiveRecord::Schema.define(version: 20171223170702) do
     t.string "description"
     t.decimal "value"
     t.decimal "balance"
-    t.string "statement_name"
-    t.integer "statement_index"
     t.string "category"
     t.string "predicted_category"
     t.integer "project_id"
