@@ -4,6 +4,8 @@ class Transaction < ApplicationRecord
   belongs_to :project
 
   default_scope { order(:date, :date_index) }
+  scope :between, ->(start_date, end_date) { where(date: start_date..end_date) }
+  scope :within_month, ->(beginning_of_month) { between(beginning_of_month, beginning_of_month.next_month) }
 
   DATA_ATTRIBUTES = [
     'account_name',

@@ -1,0 +1,22 @@
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var chart = $('#chart_div');
+    chart.css('height', chart.width() * 0.5);
+
+    var data = google.visualization.arrayToDataTable(<%=json_escape @data.to_json.html_safe %>);
+
+    var options = {
+      title: 'The decline of \'The 39 Steps\'',
+      vAxis: {title: 'Accumulated Rating'},
+      isStacked: true
+    };
+
+    var chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
+
+    chart.draw(data, options);
+  }
+</script>
+<div id="chart_div"></div>

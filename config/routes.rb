@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       post 'classify', to: 'training#classify'
 
       get 'categories'
+
+      get 'reports/spend', to: 'reports#spend'
     end
     resources :transactions, shallow: true do
       collection do
