@@ -1,6 +1,14 @@
 class TrainingController < ApplicationController
-  before_action :set_project, only: [:preview, :train]
+  before_action :set_project, only: [:preview, :train, :import, :upload]
   before_action :set_random_seed, only: [:preview, :train]
+
+  def import
+
+  end
+
+  def upload
+
+  end
 
   def preview
     partition = partition_transactions
