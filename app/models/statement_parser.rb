@@ -8,8 +8,11 @@ class StatementParser
     header = csv_data.shift
     header_map = header.map{ |x| x.strip }.each_with_index.to_h
 
-    csv_data.map do |row|
-      @project.transactions.create({
+    @project.transactions.delete_all
+
+    candidate_transactions = csv_data.map do |row|
+      @project.transactions.build({
+        account_name: row[header_map['Account Name']],
         date: row[header_map['Date']],
         transaction_type: row[header_map['Type']],
         description: row[header_map['Description']],
@@ -17,5 +20,12 @@ class StatementParser
         balance: row[header_map['Balance']]
       })
     end
+
+    candidate_transactions.group_by{ |t| t.date }.each do |date, transactions|
+      transactions.each_with_index { |t, index| t.date_index = index }
+      transactions.each { |t| t.save }
+    end
+
+    candidate_transactions
   end
 end
