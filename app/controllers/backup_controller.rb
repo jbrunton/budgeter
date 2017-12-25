@@ -1,5 +1,5 @@
 class BackupController < ApplicationController
-  before_action :set_project, only: [:index, :download, :import]
+  before_action :set_project, only: [:index, :download, :restore]
 
   def index
 
@@ -10,7 +10,7 @@ class BackupController < ApplicationController
     render plain: @content
   end
 
-  def import
+  def restore
     ProjectSerializer.new(@project).deserialize(params[:project_data].read)
     redirect_to @project, notice: 'Project data imported'
   end

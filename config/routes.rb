@@ -6,7 +6,7 @@ Rails.application.routes.draw do
     member do
       get 'backup', to: 'backup#index'
       get 'backup/download', to: 'backup#download'
-      post 'backup/import', to: 'backup#import'
+      post 'backup/restore', to: 'backup#restore'
 
       get 'train', to: 'training#train'
       post 'train', to: 'training#update'
