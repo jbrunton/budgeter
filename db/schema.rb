@@ -21,13 +21,13 @@ ActiveRecord::Schema.define(version: 20171223170702) do
   end
 
   create_table "transactions", force: :cascade do |t|
+    t.string "account_name"
     t.date "date"
+    t.integer "date_index"
     t.string "transaction_type"
     t.string "description"
     t.decimal "value"
     t.decimal "balance"
-    t.string "statement_name"
-    t.integer "statement_index"
     t.string "category"
     t.string "predicted_category"
     t.integer "project_id"

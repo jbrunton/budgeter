@@ -1,14 +1,14 @@
 class CreateTransactions < ActiveRecord::Migration[5.1]
   def change
     create_table :transactions do |t|
+      t.string :account_name
       t.date :date
+      t.integer :date_index
       t.string :transaction_type
       t.string :description
       t.decimal :value
       t.decimal :balance
 
-      t.string :statement_name
-      t.integer :statement_index
       t.string :category
       t.string :predicted_category
 

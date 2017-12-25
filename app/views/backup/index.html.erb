@@ -1,0 +1,39 @@
+<% breadcrumb :backup_project, @project %>
+
+<h1>Backup</h1>
+
+<div class="row">
+  <div class="col s6">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">Save Backup</span>
+        <p>Export a snapshot of the project as a YAML file that you can restore later.</p>
+        <a href="<%= backup_download_project_path(@project) %>"
+           class="waves-effect waves-light btn"
+           download="export.yaml">
+          <i class="material-icons left">file_download</i>
+          download
+        </a>
+        <a href="<%= backup_download_project_path(@project) %>"
+           class="waves-effect waves-light btn white black-text"
+           target="_blank">
+          <i class="material-icons left">open_in_new</i>
+          open
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col s6">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">Restore Backup</span>
+        <p>Import a snapshot and restore the project to its previous state.</p>
+        <%= form_tag({action: :restore}, multipart: true) do %>
+            <%= file_field_tag 'project_data' %>
+            <br>
+            <%= submit_tag('Restore', class: 'waves-effect waves-light btn') %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

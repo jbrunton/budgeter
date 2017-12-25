@@ -1,0 +1,9 @@
+<% breadcrumb :import_transactions, @project %>
+
+<h1>Import</h1>
+
+<%= form_tag({action: :upload}, multipart: true) do %>
+    <%= file_field_tag 'statement' %>
+    <br>
+    <%= submit_tag('Upload', class: 'waves-effect waves-light btn') %>
+<% end %>

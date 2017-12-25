@@ -2,6 +2,15 @@ class TransactionsController < ApplicationController
   before_action :set_transaction, only: [:show, :edit, :update, :destroy]
   before_action :set_project
 
+  def import
+
+  end
+
+  def upload
+    imported_transactions = StatementParser.new(@project).parse(params[:statement].read)
+    redirect_to project_transactions_path(@project), notice: "Imported #{imported_transactions.count} transactions."
+  end
+
   # GET /transactions
   # GET /transactions.json
   def index

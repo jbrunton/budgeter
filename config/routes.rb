@@ -1,20 +1,24 @@
 Rails.application.routes.draw do
+  root 'projects#index'
 
   resources :statements
   resources :projects do
     member do
-      get 'sync', to: 'sync#preview', as: 'preview_sync'
-      post 'sync', to: 'sync#sync'
+      get 'backup', to: 'backup#index'
+      get 'backup/download', to: 'backup#download'
+      post 'backup/restore', to: 'backup#restore'
 
-      get 'import', to: 'import#preview', as: 'preview_import'
-      post 'import', to: 'import#import'
-
-      get 'train', to: 'training#preview', as: 'preview_training'
-      post 'train', to: 'training#train'
+      get 'train', to: 'training#train'
+      post 'train', to: 'training#update'
 
       get 'categories'
     end
-    resources :transactions, shallow: true
+    resources :transactions, shallow: true do
+      collection do
+        get 'import'
+        post 'upload'
+      end
+    end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

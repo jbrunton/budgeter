@@ -6,4 +6,23 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-Project.create(name: 'JBRUNTON', directory: '/Users/John/budgets')
+project = Project.create(name: 'JBRUNTON', directory: '/Users/John/budgets')
+
+project.transactions.create(
+  account_name: 'JBRUNTON',
+  date: 5.days.ago,
+  date_index: 0,
+  description: 'ATM',
+  value: -10,
+  balance: 490
+)
+
+
+project.transactions.create(
+  account_name: 'JBRUNTON',
+  date: 5.days.ago,
+  date_index: 1,
+  description: 'Walgreens',
+  value: -20.00,
+  balance: 470
+)
