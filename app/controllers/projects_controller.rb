@@ -1,5 +1,5 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories, :export]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories, :export, :import, :upload]
 
   def categories
     respond_to do |format|
@@ -13,6 +13,14 @@ class ProjectsController < ApplicationController
     if params[:raw]
       render plain: @content
     end
+  end
+
+  def import
+  end
+
+  def upload
+    ProjectSerializer.new(@project).deserialize(params[:project_data].read)
+    redirect_to @project, notice: 'Project data imported'
   end
 
   # GET /projects

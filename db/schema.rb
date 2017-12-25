@@ -21,7 +21,9 @@ ActiveRecord::Schema.define(version: 20171223170702) do
   end
 
   create_table "transactions", force: :cascade do |t|
+    t.string "account_name"
     t.date "date"
+    t.integer "date_index"
     t.string "transaction_type"
     t.string "description"
     t.decimal "value"

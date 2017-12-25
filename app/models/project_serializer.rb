@@ -9,6 +9,15 @@ class ProjectSerializer
     marshal_project.to_yaml
   end
 
+  def deserialize(string)
+    content = YAML.load(string)
+    @project.name = content['name']
+    @project.transactions.delete_all
+    content['transactions'].each do |attrs|
+      @project.transactions.create(attrs)
+    end
+  end
+
 private
   def marshal_project
     {

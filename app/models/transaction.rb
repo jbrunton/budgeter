@@ -3,10 +3,12 @@ require 'digest'
 class Transaction < ApplicationRecord
   belongs_to :project
 
-  default_scope { order(:date, :statement_name, :statement_index) }
+  default_scope { order(:date, :date_index) }
 
   DATA_ATTRIBUTES = [
+    'account_name',
     'date',
+    'date_index',
     'transaction_type',
     'description',
     'value',

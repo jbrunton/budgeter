@@ -5,11 +5,8 @@ Rails.application.routes.draw do
     member do
       get 'export'
 
-      get 'sync', to: 'sync#preview', as: 'preview_sync'
-      post 'sync', to: 'sync#sync'
-
-      get 'import', to: 'import#preview', as: 'preview_import'
-      post 'import', to: 'import#import'
+      get 'import'
+      post 'upload'
 
       get 'train', to: 'training#preview', as: 'preview_training'
       post 'train', to: 'training#train'
