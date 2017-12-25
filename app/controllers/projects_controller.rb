@@ -1,26 +1,10 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories, :export, :import, :upload]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories]
 
   def categories
     respond_to do |format|
       format.json { render json: @project.categories, status: :ok }
     end
-  end
-
-  def export
-    @content = ProjectSerializer.new(@project).serialize
-
-    if params[:raw]
-      render plain: @content
-    end
-  end
-
-  def import
-  end
-
-  def upload
-    ProjectSerializer.new(@project).deserialize(params[:project_data].read)
-    redirect_to @project, notice: 'Project data imported'
   end
 
   # GET /projects

@@ -3,10 +3,9 @@ Rails.application.routes.draw do
   resources :statements
   resources :projects do
     member do
-      get 'export'
-
-      get 'import'
-      post 'upload'
+      get 'backup', to: 'backup#index'
+      get 'backup/download', to: 'backup#download'
+      post 'backup/import', to: 'backup#import'
 
       get 'train', to: 'training#preview', as: 'preview_training'
       post 'train', to: 'training#train'
