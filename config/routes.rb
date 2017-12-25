@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  root 'projects#index'
 
   resources :statements
   resources :projects do
@@ -7,8 +8,8 @@ Rails.application.routes.draw do
       get 'backup/download', to: 'backup#download'
       post 'backup/import', to: 'backup#import'
 
-      get 'train', to: 'training#preview', as: 'preview_training'
-      post 'train', to: 'training#train'
+      get 'train', to: 'training#train'
+      post 'train', to: 'training#update'
 
       get 'categories'
     end

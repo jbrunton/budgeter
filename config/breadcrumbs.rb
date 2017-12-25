@@ -8,6 +8,26 @@ crumb :project do |project|
   parent :projects
 end
 
+crumb :project_transactions do |project|
+  link 'Transactions', project_transactions_path(project)
+  parent :project, project
+end
+
+crumb :backup_project do |project|
+  link 'Backup', backup_project_path(project)
+  parent :project, project
+end
+
+crumb :import_transactions do |project|
+  link 'Import Transactions', import_project_transactions_path(project)
+  parent :project, project
+end
+
+crumb :train_project do |project|
+  link 'Train', train_project_path(project)
+  parent :project, project
+end
+
 # crumb :project_issues do |project|
 #   link "Issues", project_issues_path(project)
 #   parent :project, project

@@ -1,16 +1,8 @@
 class TrainingController < ApplicationController
-  before_action :set_project, only: [:preview, :train, :import, :upload]
+  before_action :set_project, only: [:preview, :train]
   before_action :set_random_seed, only: [:preview, :train]
 
-  def import
-
-  end
-
-  def upload
-
-  end
-
-  def preview
+  def train
     partition = partition_transactions
     @test_transactions = partition[:test_transactions]
     @training_transactions = partition[:training_transactions]
@@ -18,7 +10,7 @@ class TrainingController < ApplicationController
     render 'train'
   end
 
-  def train
+  def update
     @project.ignore_words = params[:ignore_words]
     @project.save
 
