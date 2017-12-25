@@ -16,3 +16,8 @@
 @import "materialize";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import 'transactions';
+
+textarea.yaml-preview {
+  height: 30rem;
+  font-family: "Source Code Pro", Monaco, monospace;
+}

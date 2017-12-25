@@ -1,9 +1,17 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories, :export]
 
   def categories
     respond_to do |format|
       format.json { render json: @project.categories, status: :ok }
+    end
+  end
+
+  def export
+    @content = ProjectSerializer.new(@project).serialize
+
+    if params[:raw]
+      render plain: @content
     end
   end
 

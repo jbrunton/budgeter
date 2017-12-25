@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   resources :statements
   resources :projects do
     member do
+      get 'export'
+
       get 'sync', to: 'sync#preview', as: 'preview_sync'
       post 'sync', to: 'sync#sync'
 

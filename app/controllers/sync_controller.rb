@@ -2,8 +2,6 @@ require 'fileutils'
 require 'yaml'
 
 class SyncController < ApplicationController
-  include ApplicationHelper
-
   before_action :set_project, only: [:preview, :sync]
 
   def preview
