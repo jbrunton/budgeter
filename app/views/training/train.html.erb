@@ -1,6 +1,18 @@
 <h3>Train</h3>
 
-<%= button_to 'Train', 'train', { class: 'btn waves-effect waves-light'} %>
+<%= form_tag('train', method: 'post') do %>
+    <div class="row">
+      <div class="col s6">
+        <%= label_tag(:ignore_words, 'Ignore words') %>
+        <%= text_field_tag(:ignore_words, @project.ignore_words) %>
+      </div>
+      <div class="col s6">
+        <%= label_tag(:random_seed, 'Random seed') %>
+        <%= text_field_tag(:random_seed, @random_seed) %>
+      </div>
+    </div>
+    <%= submit_tag('Train', class: 'btn waves-effect waves-light') %>
+<% end %>
 
 <% if defined? @score %>
     <h4>Score: <%= @score %>%</h4>
