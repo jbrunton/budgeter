@@ -7,9 +7,9 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 project = Project.create(name: 'JBRUNTON', directory: '/Users/John/budgets')
+account = project.accounts.create(name: 'JBRUNTON', account_type: 'current')
 
-project.transactions.create(
-  account_name: 'JBRUNTON',
+account.transactions.create(
   date: 5.days.ago,
   date_index: 0,
   description: 'ATM',
@@ -18,8 +18,7 @@ project.transactions.create(
 )
 
 
-project.transactions.create(
-  account_name: 'JBRUNTON',
+account.transactions.create(
   date: 5.days.ago,
   date_index: 1,
   description: 'Walgreens',

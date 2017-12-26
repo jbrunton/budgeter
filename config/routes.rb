@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
+  resources :accounts
   root 'projects#index'
 
-  resources :statements
   resources :projects do
     member do
       get 'backup', to: 'backup#index'
@@ -17,12 +17,12 @@ Rails.application.routes.draw do
       get 'reports/spend', to: 'reports#spend'
       get 'reports/balance', to: 'reports#balance'
 
+      get 'import_statement', to: 'statements#import', as: 'import_statement_for'
+      post 'upload_statement', to: 'statements#upload', as: 'upload_statement_to'
     end
-    resources :transactions, shallow: true do
-      collection do
-        get 'import'
-        post 'upload'
-      end
+
+    resources :accounts, shallow: true do
+      resources :transactions, shallow: true
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html

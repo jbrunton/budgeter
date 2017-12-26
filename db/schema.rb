@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171223170702) do
+ActiveRecord::Schema.define(version: 20171226173302) do
+
+  create_table "accounts", force: :cascade do |t|
+    t.string "name"
+    t.string "account_type"
+    t.integer "project_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_accounts_on_project_id"
+  end
 
   create_table "projects", force: :cascade do |t|
     t.string "name"
@@ -21,7 +30,6 @@ ActiveRecord::Schema.define(version: 20171223170702) do
   end
 
   create_table "transactions", force: :cascade do |t|
-    t.string "account_name"
     t.date "date"
     t.integer "date_index"
     t.string "transaction_type"
@@ -30,10 +38,10 @@ ActiveRecord::Schema.define(version: 20171223170702) do
     t.decimal "balance"
     t.string "category"
     t.string "predicted_category"
-    t.integer "project_id"
+    t.integer "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["project_id"], name: "index_transactions_on_project_id"
+    t.index ["account_id"], name: "index_transactions_on_account_id"
     t.index [nil], name: "index_transactions_on_status"
   end
 

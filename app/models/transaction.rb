@@ -1,7 +1,7 @@
 require 'digest'
 
 class Transaction < ApplicationRecord
-  belongs_to :project
+  belongs_to :account
 
   default_scope { order(:date, :date_index) }
   scope :between, ->(start_date, end_date) { where(date: start_date..end_date.yesterday) }

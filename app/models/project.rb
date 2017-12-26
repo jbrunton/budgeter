@@ -1,6 +1,5 @@
 class Project < ApplicationRecord
-  has_many :transactions
-  has_many :statements
+  has_many :accounts
 
   def scan_statement_transactions
     scan_dir = File.join(directory, 'statements')
@@ -24,6 +23,6 @@ class Project < ApplicationRecord
   end
 
   def categories
-    transactions.distinct.pluck(:category).compact
+    accounts.map{ |account| account.categories }.flatten.uniq
   end
 end

@@ -8,9 +8,19 @@ crumb :project do |project|
   parent :projects
 end
 
-crumb :project_transactions do |project|
-  link 'Transactions', project_transactions_path(project)
+crumb :project_accounts do |project|
+  link 'Accounts', project_accounts_path(project)
   parent :project, project
+end
+
+crumb :account do |account|
+  link account.name, account_path(account)
+  parent :project_accounts, account.project
+end
+
+crumb :account_transactions do |account|
+  link 'Transactions', account_transactions_path(account)
+  parent :account, account
 end
 
 crumb :backup_project do |project|
@@ -18,8 +28,8 @@ crumb :backup_project do |project|
   parent :project, project
 end
 
-crumb :import_transactions do |project|
-  link 'Import Transactions', import_project_transactions_path(project)
+crumb :import_statement do |project|
+  link 'Import Statement', import_statement_for_project_path(project)
   parent :project, project
 end
 
