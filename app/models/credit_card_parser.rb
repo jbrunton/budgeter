@@ -40,7 +40,7 @@ class CreditCardParser
 
   class TransactionParser
     INTEGER_CHARS = ('0'..'9').to_a
-    DECIMAL_CHARS = ['.'].concat(INTEGER_CHARS)
+    DECIMAL_CHARS = ['.', ','].concat(INTEGER_CHARS)
     DATE_REGEX = /^\d{2}\s\p{L}{3}/
 
     def initialize(line)
@@ -81,11 +81,19 @@ private
 
     def parse_value
       value = ''
+      if @line.last == '-'
+        negative = true
+        @line = @line[0..-2].strip
+      else
+        negative = false
+      end
       while DECIMAL_CHARS.include?(@line.last)
-        value << @line.last
+        value << @line.last unless @line.last == ','
         @line = @line[0..-2]
       end
-      value.length > 0 ? value.reverse : nil
+      value = value.reverse
+      value = '-' + value if negative
+      value.length > 0 ? value : nil
     end
 
     def parse_date
