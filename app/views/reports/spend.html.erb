@@ -9,8 +9,6 @@
     var data = google.visualization.arrayToDataTable(<%=json_escape @data.to_json.html_safe %>);
 
     var options = {
-      title: 'The decline of \'The 39 Steps\'',
-      vAxis: {title: 'Accumulated Rating'},
       isStacked: true
     };
 
@@ -19,4 +17,5 @@
     chart.draw(data, options);
   }
 </script>
+<h1>Spend</h1>
 <div id="chart_div"></div>
