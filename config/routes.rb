@@ -15,6 +15,8 @@ Rails.application.routes.draw do
       get 'categories'
 
       get 'reports/spend', to: 'reports#spend'
+      get 'reports/balance', to: 'reports#balance'
+
     end
     resources :transactions, shallow: true do
       collection do
