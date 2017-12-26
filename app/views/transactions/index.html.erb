@@ -39,6 +39,7 @@
   <thead>
     <tr>
       <th class="date">Date</th>
+      <th class="account_name">Account</th>
       <th class="transaction_type">Type</th>
       <th class="description">Description</th>
       <th class="value">Value</th>
@@ -51,7 +52,8 @@
   <tbody>
     <% @transactions.each do |transaction| %>
       <tr>
-        <td><%= transaction.date %></td>
+        <td><%= transaction.date.strftime('%-d %b %y') %></td>
+        <td><%= transaction.account_name %></td>
         <td><%= transaction.transaction_type %></td>
         <td><%= transaction.description %></td>
         <td class="numeric"><%= currency transaction.value %></td>

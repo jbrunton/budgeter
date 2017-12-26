@@ -23,24 +23,34 @@ table.transactions {
   }
 
   th {
+    &.date {
+      width: 8%;
+    }
+
+    &.account_name {
+      width: 10%;
+    }
+
     &.transaction_type {
       width: 6%;
     }
-
-    &.date, &.value, &.balance {
-      width: 8%;
-    }
+    // total: 24%
 
     &.description {
       width: 40%;
     }
 
+    &.value, &.balance {
+      width: 8%;
+    }
+    // total: 72%;
+
     &.category {
-      width: 15%;
+      width: 14%;
     }
 
     &.predicted_category {
-      width: 15%;
+      width: 14%;
     }
   }
 
