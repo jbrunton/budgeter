@@ -1,8 +1,4 @@
 class CreditCardParser
-  DATE_REGEX = '\d{2}\s\w{3}'
-  TRANSACTION_SUFFIX_REGEX = /\d+\.\d{2}$/
-  TRANSACTION_REGEX = /\s*(#{DATE_REGEX})\s+#{DATE_REGEX}\s+\d+\s+(.*)/
-
   def initialize(project)
     @project = project
   end
@@ -20,20 +16,12 @@ class CreditCardParser
 
     reader.pages.each do |page|
       page.text.split("\n").each do |line|
-        suffix_match = TRANSACTION_SUFFIX_REGEX.match(line)
-        if suffix_match
-          val = suffix_match[0]
-          match = TRANSACTION_REGEX.match(line.slice(0, line.length-val.length))
-          if match
-            year = 2017
-            date = Date.parse("#{match[1]} #{year}")
-            desc = match[2].strip
-            imported_transactions << account.transactions.build({
-              date: date,
-              description: desc,
-              value: val
-            })
-          end
+        line = line.strip
+        attrs = TransactionParser.new(line).parse
+        if attrs
+          imported_transactions << account.transactions.build(attrs)
+        else
+          puts "Ignoring: " + line
         end
       end
     end
@@ -48,5 +36,76 @@ class CreditCardParser
     end
 
     imported_transactions
+  end
+
+  class TransactionParser
+    INTEGER_CHARS = ('0'..'9').to_a
+    DECIMAL_CHARS = ['.'].concat(INTEGER_CHARS)
+    DATE_REGEX = /^\d{2}\s\p{L}{3}/
+
+    def initialize(line)
+      @line = line
+      @whole_line = line
+    end
+
+    def parse
+      value = parse_value
+      return nil if value.nil?
+
+      # transaction date
+      return nil if parse_date.nil?
+
+      # posting date
+      date = parse_date
+      return nil if date.nil?
+
+      # skip whatever this number is..
+      parse_integer
+
+      begin
+        attrs = {
+          value: BigDecimal.new(value),
+          date: Date.parse("#{date} 2016"),
+          description: @line
+        }
+        puts "Parsed: #{@whole_line}"
+        puts " as: " + attrs.to_s
+        attrs
+      rescue
+        puts "Failed to parse: #{@whole_line}"
+        nil
+      end
+    end
+
+private
+
+    def parse_value
+      value = ''
+      while DECIMAL_CHARS.include?(@line.last)
+        value << @line.last
+        @line = @line[0..-2]
+      end
+      value.length > 0 ? value.reverse : nil
+    end
+
+    def parse_date
+      match = DATE_REGEX.match(@line)
+      if match
+        date = match[0]
+        @line = @line[match[0].length..-1].strip
+        date
+      else
+        nil
+      end
+    end
+
+    def parse_integer
+      value = ''
+      while INTEGER_CHARS.include?(@line.first)
+        value << @line.first
+        @line = @line[1..-1].strip
+      end
+      value.length > 0 ? value : nil
+    end
   end
 end
