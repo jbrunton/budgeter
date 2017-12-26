@@ -27,13 +27,16 @@ class ReportsController < ApplicationController
   def balance
     first_date = @project.transactions.first.date
     current_date = first_date
-    current_balance = @project.transactions.first.balance
     last_date = @project.transactions.last.date
+    transactions = @project.transactions.to_a
 
     @data = [['Date', 'Balance']]
     while current_date < last_date
       next_date = current_date.tomorrow
-      balance = @project.transactions.between(first_date, next_date).last.balance
+      while transactions.first.date < next_date
+        balance = transactions.first.balance
+        transactions.shift
+      end
       @data << [serialize_date(current_date), balance.to_f]
       current_date = next_date
     end
