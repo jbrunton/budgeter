@@ -1,3 +1,5 @@
+require 'CSV'
+
 class StatementParser
   def initialize(project)
     @project = project
