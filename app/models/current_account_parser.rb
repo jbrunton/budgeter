@@ -1,12 +1,12 @@
 require 'CSV'
 
-class StatementParser
+class CurrentAccountParser
   def initialize(project)
     @project = project
   end
 
-  def parse(string)
-    csv_data = CSV.parse(string)
+  def parse(file)
+    csv_data = CSV.read(file)
     header = csv_data.shift
     header_map = header.map{ |x| x.strip }.each_with_index.to_h
 
