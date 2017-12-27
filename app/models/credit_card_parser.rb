@@ -1,6 +1,7 @@
 class CreditCardParser
   PREV_BALANCE_REGEX = /^BALANCE FROM PREVIOUS STATEMENT.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
   NEW_BALANCE_REGEX = /^NEW BALANCE.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
+  DATE_RANGE = /^(\d{2} \p{L}+ \d{4}) - (\d{2} \p{L}+ \d{4})$/
 
   def initialize(project)
     @project = project
@@ -23,6 +24,7 @@ class CreditCardParser
     lines.each_with_index do |line, index|
       match = PREV_BALANCE_REGEX.match(line)
       if match
+        puts "Matched previous balance: #{line}"
         previous_balance = BigDecimal.new(match[1].tr(',', ''))
         lines.delete_at(index)
         break
@@ -32,10 +34,28 @@ class CreditCardParser
     lines.each_with_index do |line, index|
       match = NEW_BALANCE_REGEX.match(line)
       if match
+        puts "Matched new balance: #{line}"
         new_balance = BigDecimal.new(match[1].tr(',', ''))
         lines.delete_at(index)
         break
       end
+    end
+
+    date_range_start = nil
+    date_range_end = nil
+    lines.each_with_index do |line, index|
+      match = DATE_RANGE.match(line)
+      if match
+        puts "Matched date range: #{line}"
+        date_range_start = Date.parse(match[1])
+        date_range_end = Date.parse(match[2])
+        lines.delete_at(index)
+        break
+      end
+    end
+
+    if date_range_start.nil? || date_range_end.nil?
+      raise "Unable to parse date range."
     end
 
     if previous_balance.nil?
@@ -48,7 +68,7 @@ class CreditCardParser
 
     current_balance = previous_balance
     lines.each do |line|
-      attrs = TransactionParser.new(line).parse
+      attrs = TransactionParser.new(line, date_range_start).parse
       if attrs
         current_balance += attrs[:value]
         attrs[:balance] = current_balance
@@ -63,7 +83,16 @@ class CreditCardParser
     end
 
     imported_transactions.group_by{ |t| t.date }.each do |_, transactions|
-      transactions.each_with_index { |t, index| t.date_index = index }
+      transactions.each_with_index do |t, index|
+        t.date_index = index
+
+        if date_range_start.year != date_range_end.year
+          # we're at the Dec-Jan cutover, so update years for Jan transactions
+          if t.date.month == 1
+            t.date = t.date.change(year: date_range_end.year)
+          end
+        end
+      end
       transactions.each { |t| t.save }
     end
 
@@ -75,8 +104,9 @@ class CreditCardParser
     DECIMAL_CHARS = ['.', ','].concat(INTEGER_CHARS)
     DATE_REGEX = /^\d{2}\s\p{L}{3}/
 
-    def initialize(line)
+    def initialize(line, date_range_start)
       @line = line
+      @date_range_start = date_range_start
       @whole_line = line
     end
 
@@ -97,7 +127,7 @@ class CreditCardParser
       begin
         attrs = {
           value: BigDecimal.new(value),
-          date: Date.parse("#{date} 2016"),
+          date: Date.parse("#{date} #{@date_range_start.year}"),
           description: @line
         }
         puts "Parsed: #{@whole_line}"
