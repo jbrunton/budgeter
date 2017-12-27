@@ -24,8 +24,30 @@ class ReportsController < ApplicationController
     end
   end
 
+  def balance
+    first_date = @project.transactions.first.date
+    current_date = first_date
+    last_date = @project.transactions.last.date
+    transactions = @project.transactions.to_a
+
+    @data = [['Date', 'Balance']]
+    while current_date < last_date
+      next_date = current_date.tomorrow
+      while transactions.first.date < next_date
+        balance = transactions.first.balance
+        transactions.shift
+      end
+      @data << [serialize_date(current_date), balance.to_f]
+      current_date = next_date
+    end
+  end
+
 private
   def set_project
     @project = Project.find(params[:id])
+  end
+
+  def serialize_date(date)
+    "Date('#{date.strftime('%Y-%m-%d')}')"
   end
 end

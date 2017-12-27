@@ -1,7 +1,6 @@
 class CreateTransactions < ActiveRecord::Migration[5.1]
   def change
     create_table :transactions do |t|
-      t.string :account_name
       t.date :date
       t.integer :date_index
       t.string :transaction_type
@@ -12,7 +11,7 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
       t.string :category
       t.string :predicted_category
 
-      t.references :project, foreign_key: true
+      t.references :account, foreign_key: true
 
       t.timestamps
     end

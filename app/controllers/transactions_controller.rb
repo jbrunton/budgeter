@@ -1,20 +1,12 @@
 class TransactionsController < ApplicationController
   before_action :set_transaction, only: [:show, :edit, :update, :destroy]
-  before_action :set_project
-
-  def import
-
-  end
-
-  def upload
-    imported_transactions = StatementParser.new(@project).parse(params[:statement].read)
-    redirect_to project_transactions_path(@project), notice: "Imported #{imported_transactions.count} transactions."
-  end
+  before_action :set_account
 
   # GET /transactions
   # GET /transactions.json
   def index
-    @transactions = @project.transactions
+    @transactions = @account.transactions
+    @project = @account.project
   end
 
   # GET /transactions/1
@@ -53,7 +45,7 @@ class TransactionsController < ApplicationController
     respond_to do |format|
       if @transaction.update(transaction_params)
         format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
-        format.json { render json: @project.categories, status: :ok }
+        format.json { render json: @account.project.categories, status: :ok }
       else
         format.html { render :edit }
         format.json { render json: @transaction.errors, status: :unprocessable_entity }
@@ -96,8 +88,8 @@ class TransactionsController < ApplicationController
       @transaction = Transaction.find(params[:id])
     end
 
-    def set_project
-      @project = @transaction.try(:project) || Project.find(params[:project_id])
+    def set_account
+      @account = @transaction.try(:account) || Account.find(params[:account_id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.

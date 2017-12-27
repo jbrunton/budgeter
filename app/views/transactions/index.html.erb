@@ -1,4 +1,4 @@
-<% breadcrumb :project_transactions, @project %>
+<% breadcrumb :account_transactions, @account %>
 
 <p id="notice"><%= notice %></p>
 
@@ -51,7 +51,7 @@
   <tbody>
     <% @transactions.each do |transaction| %>
       <tr>
-        <td><%= transaction.date %></td>
+        <td><%= transaction.date.strftime('%-d %b %y') %></td>
         <td><%= transaction.transaction_type %></td>
         <td><%= transaction.description %></td>
         <td class="numeric"><%= currency transaction.value %></td>
@@ -68,5 +68,3 @@
 </table>
 
 <br>
-
-<%= link_to 'New Transaction', new_project_transaction_path(@project) %>
