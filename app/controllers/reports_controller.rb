@@ -28,17 +28,14 @@ class ReportsController < ApplicationController
     first_date = @project.transactions.first.date
     current_date = first_date
     last_date = @project.transactions.last.date
-    transactions = @project.transactions.to_a
 
     @data = [['Date', 'Balance']]
     while current_date < last_date
-      next_date = current_date.tomorrow
-      while transactions.first.date < next_date
-        balance = transactions.first.balance
-        transactions.shift
-      end
+      current_balance_sum = @project.accounts.current.map { |a| a.balance_on(current_date) }.reduce(:+)
+      credit_balance_sum = @project.accounts.credit_card.map{ |a| a.balance_on(current_date) }.reduce(:+)
+      balance = (current_balance_sum || 0) - (credit_balance_sum || 0)
       @data << [serialize_date(current_date), balance.to_f]
-      current_date = next_date
+      current_date = current_date.tomorrow
     end
   end
 

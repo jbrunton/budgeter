@@ -1,5 +1,6 @@
 class Project < ApplicationRecord
   has_many :accounts
+  has_many :transactions, through: :accounts
 
   def scan_statement_transactions
     scan_dir = File.join(directory, 'statements')
