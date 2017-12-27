@@ -1,4 +1,7 @@
 class CreditCardParser
+  PREV_BALANCE_REGEX = /^BALANCE FROM PREVIOUS STATEMENT.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
+  NEW_BALANCE_REGEX = /^NEW BALANCE.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
+
   def initialize(project)
     @project = project
   end
@@ -12,23 +15,52 @@ class CreditCardParser
 
     imported_transactions = []
 
-    start_time = DateTime.now
+    previous_balance = nil
+    new_balance = nil
 
-    reader.pages.each do |page|
-      page.text.split("\n").each do |line|
-        line = line.strip
-        attrs = TransactionParser.new(line).parse
-        if attrs
-          imported_transactions << account.transactions.build(attrs)
-        else
-          puts "Ignoring: " + line
-        end
+    lines = reader.pages.map { |page| page.text.split("\n").map{ |line| line.strip } }.flatten
+
+    lines.each_with_index do |line, index|
+      match = PREV_BALANCE_REGEX.match(line)
+      if match
+        previous_balance = BigDecimal.new(match[1].tr(',', ''))
+        lines.delete_at(index)
+        break
       end
     end
 
-    end_time = DateTime.now
-    total_time = ((end_time - start_time) * 1.days).to_f
-    puts "Parse time: #{total_time} seconds"
+    lines.each_with_index do |line, index|
+      match = NEW_BALANCE_REGEX.match(line)
+      if match
+        new_balance = BigDecimal.new(match[1].tr(',', ''))
+        lines.delete_at(index)
+        break
+      end
+    end
+
+    if previous_balance.nil?
+      raise "Unable to parse previous balance."
+    end
+
+    if new_balance.nil?
+      raise "Unable to parse previous balance."
+    end
+
+    current_balance = previous_balance
+    lines.each do |line|
+      attrs = TransactionParser.new(line).parse
+      if attrs
+        current_balance += attrs[:value]
+        attrs[:balance] = current_balance
+        imported_transactions << account.transactions.build(attrs)
+      else
+        puts "Ignoring: " + line
+      end
+    end
+
+    if current_balance != new_balance
+      raise "Error: computed new balance (#{current_balance}) != stated new balance (#{new_balance})"
+    end
 
     imported_transactions.group_by{ |t| t.date }.each do |_, transactions|
       transactions.each_with_index { |t, index| t.date_index = index }
