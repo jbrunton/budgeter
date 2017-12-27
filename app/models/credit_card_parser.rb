@@ -43,7 +43,7 @@ class CreditCardParser
     end
 
     if new_balance.nil?
-      raise "Unable to parse previous balance."
+      raise "Unable to parse new balance."
     end
 
     current_balance = previous_balance
