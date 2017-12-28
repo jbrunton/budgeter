@@ -11,17 +11,18 @@
     </div>
   <% end %>
 
-  <div class="field">
+  <div class="input-field">
     <%= form.label :name %>
     <%= form.text_field :name, id: :account_name %>
   </div>
 
-  <div class="field">
+  <div class="input-field">
+    <%= form.select :account_type, Account::TYPES %>
     <%= form.label :type %>
-    <%= form.text_field :account_type, id: :account_type %>
   </div>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit class: 'waves-effect waves-light btn' %>
+    <%= link_to 'Cancel', @account.new_record? ? project_accounts_path(@project) : @account, class: 'waves-effect waves-light btn white black-text' %>
   </div>
 <% end %>
