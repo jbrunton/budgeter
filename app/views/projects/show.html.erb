@@ -13,12 +13,9 @@
   </div>
   <div class="col s4">
     <ul class="collection with-header">
-      <li class="collection-header"><h4>Transactions</h4></li>
+      <li class="collection-header"><h4>Accounts</h4></li>
       <li class="collection-item">
         <%= link_to 'View Accounts', project_accounts_path(@project) %>
-      </li>
-      <li class="collection-item">
-        <%= link_to 'Import Statements', import_statement_for_project_path(@project) %>
       </li>
       <li class="collection-item">
         <%= link_to 'Backup and Restore', backup_project_path(@project) %>
