@@ -43,7 +43,6 @@ private
     md5 << date.strftime('%Y-%m-%d')
     md5 << description
     md5 << value.to_s
-    md5 << balance.to_s
     self.sha = md5.hexdigest
   end
 end
