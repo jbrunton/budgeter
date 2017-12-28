@@ -38,6 +38,11 @@ crumb :train_project do |project|
   parent :project, project
 end
 
+crumb :report_balance do |project|
+  link 'Balance', reports_balance_project_path(project)
+  parent :project, project
+end
+
 # crumb :project_issues do |project|
 #   link "Issues", project_issues_path(project)
 #   parent :project, project
