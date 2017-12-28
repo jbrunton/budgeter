@@ -11,7 +11,7 @@ class CreditCardParser
   def parse(file)
     reader = PDF::Reader.new(file)
 
-    imported_transactions = []
+    candidate_transactions = []
 
     previous_balance = nil
     new_balance = nil
@@ -80,7 +80,6 @@ class CreditCardParser
       account.account_type = 'credit_card'
       account.save
     end
-    account.transactions.delete_all
 
     current_balance = previous_balance
     lines.each do |line|
@@ -88,7 +87,7 @@ class CreditCardParser
       if attrs
         current_balance += attrs[:value]
         attrs[:balance] = current_balance
-        imported_transactions << account.transactions.build(attrs)
+        candidate_transactions << account.transactions.build(attrs)
       else
         puts "Ignoring: " + line
       end
@@ -98,21 +97,41 @@ class CreditCardParser
       raise "Error: computed new balance (#{current_balance}) != stated new balance (#{new_balance})"
     end
 
-    imported_transactions.group_by{ |t| t.date }.each do |_, transactions|
-      transactions.each_with_index do |t, index|
-        t.date_index = index
-
-        if date_range_start.year != date_range_end.year
-          # we're at the Dec-Jan cutover, so update years for Jan transactions
-          if t.date.month == 1
-            t.date = t.date.change(year: date_range_end.year)
-          end
+    if date_range_start.year != date_range_end.year
+      candidate_transactions.each do |t|
+        # we're at the Dec-Jan cutover, so update years for Jan transactions
+        if t.date.month == 1
+          t.date = t.date.change(year: date_range_end.year)
         end
       end
-      transactions.each { |t| t.save }
     end
 
-    imported_transactions
+    duplicate_transactions = []
+    imported_transactions = []
+    candidate_transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
+      duplicate_transactions_for_date = []
+      transactions_on_date.each_with_index do |t, index|
+        begin
+          t.date_index = index
+          t.save
+          imported_transactions << t
+        rescue ActiveRecord::RecordNotUnique => e
+          duplicate_transactions_for_date << t
+          duplicate_transactions << t
+        end
+      end
+      if duplicate_transactions_for_date.length > 0
+        if transactions_on_date.count != duplicate_transactions_for_date.count
+          raise "Error: some duplicate transactions detected for #{date}"
+        end
+      end
+    end
+
+    {
+      account: account,
+      imported_transactions: imported_transactions,
+      duplicate_transactions: duplicate_transactions
+    }
   end
 
   class TransactionParser

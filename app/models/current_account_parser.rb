@@ -22,9 +22,8 @@ class CurrentAccountParser
       account.account_type = 'current'
       account.save
     end
-    account.transactions.delete_all
 
-    imported_transactions = csv_data.map do |row|
+    candidate_transactions = csv_data.map do |row|
       account.transactions.build({
         date: row[header_map['Date']],
         transaction_type: row[header_map['Type']],
@@ -34,12 +33,32 @@ class CurrentAccountParser
       })
     end
 
-    imported_transactions.group_by{ |t| t.date }.each do |_, transactions|
-      transactions.each_with_index { |t, index| t.date_index = index }
-      transactions.each { |t| t.save }
+    duplicate_transactions = []
+    imported_transactions = []
+    candidate_transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
+      duplicate_transactions_for_date = []
+      transactions_on_date.each_with_index do |t, index|
+        begin
+          t.date_index = index
+          t.save
+          imported_transactions << t
+        rescue ActiveRecord::RecordNotUnique => e
+          duplicate_transactions_for_date << t
+          duplicate_transactions << t
+        end
+      end
+      if duplicate_transactions_for_date.length > 0
+        if transactions_on_date.count != duplicate_transactions_for_date.count
+          raise "Error: some duplicate transactions detected for #{date}"
+        end
+      end
     end
 
-    imported_transactions
+    {
+      account: account,
+      imported_transactions: imported_transactions,
+      duplicate_transactions: duplicate_transactions
+    }
   end
 
 private

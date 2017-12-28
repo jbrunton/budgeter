@@ -10,13 +10,15 @@ class StatementsController < ApplicationController
     ext = File.extname(upload.original_filename)
     case
       when ext == '.csv'
-        imported_transactions = CurrentAccountParser.new(@project).parse(upload.tempfile)
+        result = CurrentAccountParser.new(@project).parse(upload.tempfile)
       when ext == '.pdf'
-        imported_transactions = CreditCardParser.new(@project).parse(upload.tempfile)
+        result = CreditCardParser.new(@project).parse(upload.tempfile)
       else
         raise "Unsupported file extension."
     end
-    redirect_to account_transactions_path(imported_transactions.first.account), notice: "Imported #{imported_transactions.count} transactions."
+    notice = "Imported #{result[:imported_transactions].count} transactions"
+    notice << " (#{result[:duplicate_transactions].count} duplicates)" if result[:duplicate_transactions].any?
+    redirect_to account_transactions_path(result[:account]), notice: notice
   end
 
 private
