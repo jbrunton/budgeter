@@ -39,7 +39,7 @@ crumb :train_project do |project|
 end
 
 crumb :report_balance do |project|
-  link 'Balance', reports_balance_project_path(project)
+  link 'Balance History', reports_balance_project_path(project)
   parent :project, project
 end
 
