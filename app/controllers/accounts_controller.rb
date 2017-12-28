@@ -1,6 +1,6 @@
 class AccountsController < ApplicationController
   before_action :set_account, only: [:show, :edit, :update, :destroy]
-  before_action :set_project, only: [:index]
+  before_action :set_project
 
   # GET /accounts
   # GET /accounts.json
@@ -16,22 +16,25 @@ class AccountsController < ApplicationController
   # GET /accounts/new
   def new
     @account = Account.new
+    @record = [@project, @account]
   end
 
   # GET /accounts/1/edit
   def edit
+    @record = @account
   end
 
   # POST /accounts
   # POST /accounts.json
   def create
-    @account = Account.new(account_params)
+    @account = @project.accounts.build(account_params)
 
     respond_to do |format|
       if @account.save
         format.html { redirect_to @account, notice: 'Account was successfully created.' }
         format.json { render :show, status: :created, location: @account }
       else
+        @record = [@project, @account]
         format.html { render :new }
         format.json { render json: @account.errors, status: :unprocessable_entity }
       end
@@ -57,7 +60,7 @@ class AccountsController < ApplicationController
   def destroy
     @account.destroy
     respond_to do |format|
-      format.html { redirect_to accounts_url, notice: 'Account was successfully destroyed.' }
+      format.html { redirect_to project_accounts_url(@project), notice: 'Account was successfully destroyed.' }
       format.json { head :no_content }
     end
   end
@@ -69,11 +72,11 @@ private
   end
 
   def set_project
-    @project = Project.find(params[:project_id])
+    @project = @account.try(:project) || Project.find(params[:project_id])
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def account_params
-    params.require(:account).permit(:name, :type, :project_id)
+    params.require(:account).permit(:name, :account_type)
   end
 end

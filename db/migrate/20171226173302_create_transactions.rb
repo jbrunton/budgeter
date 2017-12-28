@@ -11,7 +11,7 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
       t.string :category
       t.string :predicted_category
 
-      t.references :account, foreign_key: true
+      t.references :account, foreign_key: {on_delete: :cascade}
 
       t.timestamps
     end

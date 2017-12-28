@@ -16,7 +16,7 @@ class CurrentAccountParser
     if account_name.starts_with?("'")
       account_name.slice!(0)
     end
-    
+
     account = @project.accounts.find_or_initialize_by(name: account_name)
     if account.new_record?
       account.account_type = 'current'
