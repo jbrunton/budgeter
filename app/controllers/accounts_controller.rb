@@ -1,6 +1,26 @@
 class AccountsController < ApplicationController
-  before_action :set_account, only: [:show, :edit, :update, :destroy]
+  before_action :set_account, only: [:show, :edit, :update, :destroy, :import_statement, :upload_statement]
   before_action :set_project
+
+  def import_statement
+
+  end
+
+  def upload_statement
+    upload = params[:statement]
+    ext = File.extname(upload.original_filename)
+    case
+      when ext == '.csv'
+        result = CurrentAccountParser.new(@account).parse(upload.tempfile)
+      when ext == '.pdf'
+        result = CreditCardParser.new(@account).parse(upload.tempfile)
+      else
+        raise "Unsupported file extension."
+    end
+    notice = "Imported #{result[:imported_transactions].count} transactions"
+    notice << " (#{result[:duplicate_transactions].count} duplicates)" if result[:duplicate_transactions].any?
+    redirect_to account_transactions_path(@account), notice: notice
+  end
 
   # GET /accounts
   # GET /accounts.json

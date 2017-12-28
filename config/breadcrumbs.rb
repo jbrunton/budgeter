@@ -28,9 +28,9 @@ crumb :backup_project do |project|
   parent :project, project
 end
 
-crumb :import_statement do |project|
-  link 'Import Statement', import_statement_for_project_path(project)
-  parent :project, project
+crumb :import_statement do |account|
+  link 'Import Statement', import_statement_account_path(account)
+  parent :account, account
 end
 
 crumb :train_project do |project|

@@ -1,8 +1,8 @@
 require 'CSV'
 
 class CurrentAccountParser
-  def initialize(project)
-    @project = project
+  def initialize(account)
+    @account = account
   end
 
   def parse(file)
@@ -12,19 +12,8 @@ class CurrentAccountParser
 
     validate(csv_data, header_map)
 
-    account_name = csv_data[0][header_map['Account Name']]
-    if account_name.starts_with?("'")
-      account_name.slice!(0)
-    end
-
-    account = @project.accounts.find_or_initialize_by(name: account_name)
-    if account.new_record?
-      account.account_type = 'current'
-      account.save
-    end
-
     candidate_transactions = csv_data.map do |row|
-      account.transactions.build({
+      @account.transactions.build({
         date: row[header_map['Date']],
         transaction_type: row[header_map['Type']],
         description: row[header_map['Description']],
@@ -36,7 +25,7 @@ class CurrentAccountParser
     duplicate_transactions = []
     imported_transactions = []
     candidate_transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
-      existing_transactions_on_date = account.transactions.where(date: date)
+      existing_transactions_on_date = @account.transactions.where(date: date)
       if existing_transactions_on_date.count > 0
         duplicate_transactions_for_date = []
         transactions_on_date.each do |t|
@@ -59,7 +48,6 @@ class CurrentAccountParser
     end
 
     {
-      account: account,
       imported_transactions: imported_transactions,
       duplicate_transactions: duplicate_transactions
     }

@@ -3,10 +3,9 @@ class CreditCardParser
   NEW_BALANCE_REGEX = /^NEW BALANCE.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
   DATE_RANGE_SPAN_YEARS = /^(\d{2} \p{L}+ \d{4}) - (\d{2} \p{L}+ \d{4})$/
   DATE_RANGE_SAME_YEAR = /^(\d{2} \p{L}+) - (\d{2} \p{L}+ \d{4})$/
-  CARD_NUMBER_REGEX = /^\d{4} \d{4} \d{4} (\d{4})$/
 
-  def initialize(project)
-    @project = project
+  def initialize(account)
+    @account = account
   end
 
   def parse(file)
@@ -17,16 +16,6 @@ class CreditCardParser
     previous_balance = nil
     new_balance = nil
     lines = reader.pages.map { |page| page.text.split("\n").map{ |line| line.strip } }.flatten
-
-    account_name = nil
-    lines.each_with_index do |line, index|
-      match = CARD_NUMBER_REGEX.match(line)
-      if match
-        account_name = "**** **** **** #{match[1]}"
-        lines.delete_at(index)
-        break
-      end
-    end
 
     lines.each_with_index do |line, index|
       match = PREV_BALANCE_REGEX.match(line)
@@ -69,10 +58,6 @@ class CreditCardParser
       end
     end
 
-    if account_name.nil?
-      raise "Unable to parse card number"
-    end
-
     if date_range_start.nil? || date_range_end.nil?
       raise "Unable to parse date range."
     end
@@ -85,19 +70,13 @@ class CreditCardParser
       raise "Unable to parse new balance."
     end
 
-    account = @project.accounts.find_or_initialize_by(name: account_name)
-    if account.new_record?
-      account.account_type = 'credit_card'
-      account.save
-    end
-
     current_balance = previous_balance
     lines.each do |line|
       attrs = TransactionParser.new(line, date_range_start).parse
       if attrs
         current_balance += attrs[:value]
         attrs[:balance] = current_balance
-        candidate_transactions << account.transactions.build(attrs)
+        candidate_transactions << @account.transactions.build(attrs)
       else
         puts "Ignoring: " + line
       end
@@ -119,7 +98,7 @@ class CreditCardParser
     duplicate_transactions = []
     imported_transactions = []
     candidate_transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
-      existing_transactions_on_date = account.transactions.where(date: date)
+      existing_transactions_on_date = @account.transactions.where(date: date)
       if existing_transactions_on_date.count > 0
         duplicate_transactions_for_date = []
         transactions_on_date.each do |t|
@@ -142,7 +121,6 @@ class CreditCardParser
     end
 
     {
-      account: account,
       imported_transactions: imported_transactions,
       duplicate_transactions: duplicate_transactions
     }
