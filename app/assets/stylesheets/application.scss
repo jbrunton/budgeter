@@ -13,6 +13,11 @@
  *= require_self
  */
 
+@import 'materialize/components/color';
+
+$primary-color: color("deep-purple", "darken-2") !default;
+$secondary-color: color("pink", "base") !default;
+
 @import "materialize";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import 'transactions';
