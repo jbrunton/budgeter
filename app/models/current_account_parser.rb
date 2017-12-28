@@ -48,7 +48,8 @@ class CurrentAccountParser
         end
       end
       if duplicate_transactions_for_date.length > 0
-        if transactions_on_date.count != duplicate_transactions_for_date.count
+        existing_transactions_on_date = account.transactions.where(date: date)
+        if duplicate_transactions_for_date.count != existing_transactions_on_date.count
           raise "Error: some duplicate transactions detected for #{date}"
         end
       end
