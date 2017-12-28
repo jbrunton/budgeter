@@ -29,12 +29,24 @@ class ReportsController < ApplicationController
     current_date = first_date
     last_date = @project.transactions.last.date
 
-    @data = [['Date', 'Balance']]
+    @data = [['Date'].concat(@project.accounts.map{ |a| a.name }).concat(['Total'])]
     while current_date < last_date
-      current_balance_sum = @project.accounts.current.map { |a| a.balance_on(current_date) }.reduce(:+)
-      credit_balance_sum = @project.accounts.credit_card.map{ |a| a.balance_on(current_date) }.reduce(:+)
-      balance = (current_balance_sum || 0) - (credit_balance_sum || 0)
-      @data << [serialize_date(current_date), balance.to_f]
+      row = [serialize_date(current_date)]
+
+      account_balances = @project.accounts.map do |a|
+        balance = a.balance_on(current_date).to_f
+        {
+          balance: a.account_type == 'credit_card' ? -balance : balance,
+          account_type: a.account_type
+        }
+      end
+      row.concat(account_balances.map{ |a| a[:balance] })
+
+      total = account_balances
+        .map{ |a| a[:balance] }
+        .reduce(:+)
+      row << total
+      @data << row
       current_date = current_date.tomorrow
     end
   end
