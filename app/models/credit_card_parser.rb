@@ -1,7 +1,8 @@
 class CreditCardParser
   PREV_BALANCE_REGEX = /^BALANCE FROM PREVIOUS STATEMENT.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
   NEW_BALANCE_REGEX = /^NEW BALANCE.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
-  DATE_RANGE = /^(\d{2} \p{L}+ \d{4}) - (\d{2} \p{L}+ \d{4})$/
+  DATE_RANGE_SPAN_YEARS = /^(\d{2} \p{L}+ \d{4}) - (\d{2} \p{L}+ \d{4})$/
+  DATE_RANGE_SAME_YEAR = /^(\d{2} \p{L}+) - (\d{2} \p{L}+ \d{4})$/
   CARD_NUMBER_REGEX = /^\d{4} \d{4} \d{4} (\d{4})$/
 
   def initialize(project)
@@ -22,6 +23,7 @@ class CreditCardParser
       match = CARD_NUMBER_REGEX.match(line)
       if match
         account_name = "**** **** **** #{match[1]}"
+        lines.delete_at(index)
         break
       end
     end
@@ -49,7 +51,15 @@ class CreditCardParser
     date_range_start = nil
     date_range_end = nil
     lines.each_with_index do |line, index|
-      match = DATE_RANGE.match(line)
+      match = DATE_RANGE_SAME_YEAR.match(line)
+      if match
+        puts "Matched date range: #{line}"
+        date_range_end = Date.parse(match[2])
+        date_range_start = Date.parse("#{match[1]} #{date_range_end.year}")
+        lines.delete_at(index)
+        break
+      end
+      match = DATE_RANGE_SPAN_YEARS.match(line)
       if match
         puts "Matched date range: #{line}"
         date_range_start = Date.parse(match[1])
@@ -109,22 +119,25 @@ class CreditCardParser
     duplicate_transactions = []
     imported_transactions = []
     candidate_transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
-      duplicate_transactions_for_date = []
-      transactions_on_date.each_with_index do |t, index|
-        begin
+      existing_transactions_on_date = account.transactions.where(date: date)
+      if existing_transactions_on_date.count > 0
+        duplicate_transactions_for_date = []
+        transactions_on_date.each do |t|
+          e = existing_transactions_on_date.select{ |e| e.sha == t.sha }.first
+          duplicate_transactions_for_date << e unless e.nil?
+        end
+        if duplicate_transactions_for_date.length > 0
+          if duplicate_transactions_for_date.count != existing_transactions_on_date.count
+            raise "Error: some duplicate transactions detected for #{date}"
+          end
+        end
+        duplicate_transactions.concat(transactions_on_date)
+      else
+        transactions_on_date.each_with_index do |t, index|
           t.date_index = index
           t.save
-          imported_transactions << t
-        rescue ActiveRecord::RecordNotUnique => e
-          duplicate_transactions_for_date << t
-          duplicate_transactions << t
         end
-      end
-      if duplicate_transactions_for_date.length > 0
-        existing_transactions_on_date = account.transactions.where(date: date)
-        if duplicate_transactions_for_date.count != existing_transactions_on_date.count
-          raise "Error: some duplicate transactions detected for #{date}"
-        end
+        imported_transactions.concat(transactions_on_date)
       end
     end
 

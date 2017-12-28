@@ -11,13 +11,10 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
       t.string :category
       t.string :predicted_category
 
-      t.string :sha
-
       t.references :account, foreign_key: {on_delete: :cascade}
 
       t.timestamps
     end
     add_index :transactions, :status
-    add_index :transactions, [:account_id, :sha], unique: true
   end
 end

@@ -36,22 +36,25 @@ class CurrentAccountParser
     duplicate_transactions = []
     imported_transactions = []
     candidate_transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
-      duplicate_transactions_for_date = []
-      transactions_on_date.each_with_index do |t, index|
-        begin
+      existing_transactions_on_date = account.transactions.where(date: date)
+      if existing_transactions_on_date.count > 0
+        duplicate_transactions_for_date = []
+        transactions_on_date.each do |t|
+          e = existing_transactions_on_date.select{ |e| e.sha == t.sha }.first
+          duplicate_transactions_for_date << e unless e.nil?
+        end
+        if duplicate_transactions_for_date.length > 0
+          if duplicate_transactions_for_date.count != existing_transactions_on_date.count
+            raise "Error: some duplicate transactions detected for #{date}"
+          end
+        end
+        duplicate_transactions.concat(transactions_on_date)
+      else
+        transactions_on_date.each_with_index do |t, index|
           t.date_index = index
           t.save
-          imported_transactions << t
-        rescue ActiveRecord::RecordNotUnique => e
-          duplicate_transactions_for_date << t
-          duplicate_transactions << t
         end
-      end
-      if duplicate_transactions_for_date.length > 0
-        existing_transactions_on_date = account.transactions.where(date: date)
-        if duplicate_transactions_for_date.count != existing_transactions_on_date.count
-          raise "Error: some duplicate transactions detected for #{date}"
-        end
+        imported_transactions.concat(transactions_on_date)
       end
     end
 

@@ -38,11 +38,9 @@ ActiveRecord::Schema.define(version: 20171226173302) do
     t.decimal "balance"
     t.string "category"
     t.string "predicted_category"
-    t.string "sha"
     t.integer "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["account_id", "sha"], name: "index_transactions_on_account_id_and_sha", unique: true
     t.index ["account_id"], name: "index_transactions_on_account_id"
     t.index [nil], name: "index_transactions_on_status"
   end
