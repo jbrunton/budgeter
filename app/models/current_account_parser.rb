@@ -13,7 +13,15 @@ class CurrentAccountParser
     validate(csv_data, header_map)
 
     account_name = csv_data[0][header_map['Account Name']]
-    account = @project.accounts.find_or_create_by(name: account_name)
+    if account_name.starts_with?("'")
+      account_name.slice!(0)
+    end
+    
+    account = @project.accounts.find_or_initialize_by(name: account_name)
+    if account.new_record?
+      account.account_type = 'current'
+      account.save
+    end
     account.transactions.delete_all
 
     imported_transactions = csv_data.map do |row|

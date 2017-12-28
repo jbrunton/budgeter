@@ -2,6 +2,7 @@ class CreditCardParser
   PREV_BALANCE_REGEX = /^BALANCE FROM PREVIOUS STATEMENT.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
   NEW_BALANCE_REGEX = /^NEW BALANCE.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
   DATE_RANGE = /^(\d{2} \p{L}+ \d{4}) - (\d{2} \p{L}+ \d{4})$/
+  CARD_NUMBER_REGEX = /^\d{4} \d{4} \d{4} (\d{4})$/
 
   def initialize(project)
     @project = project
@@ -10,16 +11,20 @@ class CreditCardParser
   def parse(file)
     reader = PDF::Reader.new(file)
 
-    account_name = 'Credit Card'
-    account = @project.accounts.find_or_create_by(name: account_name)
-    account.transactions.delete_all
-
     imported_transactions = []
 
     previous_balance = nil
     new_balance = nil
-
     lines = reader.pages.map { |page| page.text.split("\n").map{ |line| line.strip } }.flatten
+
+    account_name = nil
+    lines.each_with_index do |line, index|
+      match = CARD_NUMBER_REGEX.match(line)
+      if match
+        account_name = "**** **** **** #{match[1]}"
+        break
+      end
+    end
 
     lines.each_with_index do |line, index|
       match = PREV_BALANCE_REGEX.match(line)
@@ -54,6 +59,10 @@ class CreditCardParser
       end
     end
 
+    if account_name.nil?
+      raise "Unable to parse card number"
+    end
+
     if date_range_start.nil? || date_range_end.nil?
       raise "Unable to parse date range."
     end
@@ -65,6 +74,13 @@ class CreditCardParser
     if new_balance.nil?
       raise "Unable to parse new balance."
     end
+
+    account = @project.accounts.find_or_initialize_by(name: account_name)
+    if account.new_record?
+      account.account_type = 'credit_card'
+      account.save
+    end
+    account.transactions.delete_all
 
     current_balance = previous_balance
     lines.each do |line|
