@@ -17,13 +17,13 @@ class BalanceReportBuilder
     self
   end
 
-  def build
+  def build(account_ids, show_total)
     table_builder = DataTableBuilder.new
     table_builder.column({ id: 'date', type: 'date', label: 'Date' }, @dates.map{ |d| serialize_date(d) })
     @balances.each do |account, balances|
-      table_builder.number({ label: account.name }, balances)
+      table_builder.number({ label: account.name }, balances) if account_ids.include?(account.id.to_s)
     end
-    table_builder.number({ label: 'Total' }, @totals)
+    table_builder.number({ label: 'Total' }, @totals) if show_total
     table_builder.build
   end
 end

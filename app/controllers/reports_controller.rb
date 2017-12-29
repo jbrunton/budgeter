@@ -30,7 +30,7 @@ class ReportsController < ApplicationController
 
   def balance
     today = Date.today
-    @default_start_date = today.beginning_of_month
+    @default_start_date = today - 90.days
     @default_end_date = today
   end
 
@@ -42,7 +42,7 @@ class ReportsController < ApplicationController
     builder = BalanceReportBuilder.new(dates)
     @project.accounts.each { |account| builder.add_balances_from(account) }
 
-    render json: builder.build.to_json
+    render json: builder.build(params[:account_ids] || [], params[:show_total]).to_json
   end
 
 private
