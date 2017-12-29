@@ -6,7 +6,7 @@ class ReportsController < ApplicationController
     last_date = @project.transactions.last.date
 
     categories = Transaction.where(account: @project.accounts)
-      .group(:predicted_category)
+      .group('coalesce(category, predicted_category)')
       .sum(:value)
       .sort_by { |_, v| v }
       .to_h
@@ -16,20 +16,12 @@ class ReportsController < ApplicationController
       next_month = current_month.next_month
       row = [current_month.strftime('%b %Y')]
       categories.each do |category, _|
-        credit_card_month_spend = @project.transactions
+        month_spend = @project.transactions
           .within_month(current_month)
-          .where(predicted_category: category)
+          .where('coalesce(category, predicted_category) = ?', category)
           .joins(:account)
-          .where("accounts.account_type = 'credit_card'")
-          .sum(:value)
-        current_month_spend = @project.transactions
-          .within_month(current_month)
-          .where(predicted_category: category)
-          .joins(:account)
-          .where("accounts.account_type = 'current'")
-          .sum(:value)
-        month_spend = credit_card_month_spend - current_month_spend
-        row << month_spend.to_f
+          .sum("case accounts.account_type when 'credit_card' then -value else value end")
+        row << (month_spend < 0 ? -month_spend.to_f : 0)
       end
       @data << row
       current_month = next_month
