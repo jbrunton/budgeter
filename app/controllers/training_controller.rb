@@ -11,7 +11,7 @@ class TrainingController < ApplicationController
     @training_transactions = partition[:training_transactions]
 
     classifier = StuffClassifier::Bayes.new('Transaction Classifier')
-    classifier.ignore_words = @project.ignore_words.split(',').map{ |s| s.chomp }
+    classifier.ignore_words = params[:ignore_words].split(',').map{ |s| s.chomp }
     @training_transactions.each do |t|
       classifier.train(t.category, t.description)
     end
@@ -44,7 +44,7 @@ class TrainingController < ApplicationController
       t.save
     end
 
-    redirect_to project_transactions_path(@project), notice: 'Transactions classified.'
+    redirect_to @project, notice: 'Transactions classified.'
   end
 
 private

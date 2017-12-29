@@ -11,6 +11,7 @@ table.transactions {
 
   td, th {
     padding: 2px;
+    border-radius: 0;
   }
 
   tr {
@@ -19,6 +20,9 @@ table.transactions {
     }
     &.incorrect {
       @extend .red, .lighten-5;
+    }
+    &.highlight {
+      @extend .pink, .lighten-5;
     }
   }
 
@@ -67,5 +71,12 @@ table.transactions {
   .autocomplete-content {
     position: absolute;
     margin-top: 0;
+
+    li {
+      min-height: 0;
+      & > a, & > span {
+        padding: 4px 4px 2px 4px;
+      }
+    }
   }
 }

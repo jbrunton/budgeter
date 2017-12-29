@@ -19,6 +19,8 @@ class ProjectSerializer
     content['accounts'].each do |account_attrs|
       account = @project.accounts.create(account_attrs.slice('name', 'account_type'))
       account_attrs['transactions'].each do |transaction_attrs|
+        transaction_attrs['value'].tr!(',', '')
+        transaction_attrs['balance'].tr!(',', '')
         account.transactions.create(transaction_attrs)
       end
     end
