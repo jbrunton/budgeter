@@ -1,0 +1,7 @@
+a.btn-flat {
+  color: $link-color;
+  &:hover {
+    @extend .z-depth-1;
+    background-color: rgba(0,0,0,.05);
+  }
+}
