@@ -7,18 +7,20 @@
   google.charts.setOnLoadCallback(drawChart);
 
   function drawChart() {
-    var chart = $('#chart_div');
-    chart.css('height', chart.width() * 0.7);
+    var div = $('#chart_div');
+    div.css('height', div.width() * 0.7);
 
-    var data = google.visualization.arrayToDataTable(coerceData(<%=json_escape @data.to_json.html_safe %>));
+    $.get('balance_data', function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        isStacked: true
+      };
 
-    var options = {
-      isStacked: true
-    };
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
 
-    var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
 
-    chart.draw(data, options);
+    });
   }
 </script>
 <div id="chart_div"></div>
