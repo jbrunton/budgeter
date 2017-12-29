@@ -15,6 +15,12 @@
 //= require materialize
 //= require_tree .
 
-$(document).ready(function() {
+$(function() {
+  $('button.close').on('click', function () {
+    $(this).closest('.panel').fadeOut('normal', function () {
+      $(this).remove();
+    });
+  });
+
   $('select').material_select();
 });

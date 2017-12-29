@@ -22,9 +22,15 @@ $secondary-color: color("pink", "base") !default;
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import 'transactions';
 
+@import 'layout/page';
+@import 'components/panel';
+@import 'components/button';
+
 textarea.yaml-preview {
   height: 30rem;
   font-family: "Source Code Pro", Monaco, monospace;
 }
 
-
+h3 {
+  font-weight: 300;
+}

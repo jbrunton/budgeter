@@ -1,0 +1,8 @@
+body {
+  background-color: color("deep-purple", "lighten-5");
+}
+
+.page-content {
+  @extend .card, .card-content;
+  padding: 1rem 2rem;
+}
