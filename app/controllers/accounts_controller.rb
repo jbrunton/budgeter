@@ -25,7 +25,7 @@ class AccountsController < ApplicationController
   # GET /accounts
   # GET /accounts.json
   def index
-    @accounts = Account.all
+    @accounts = @project.accounts
   end
 
   # GET /accounts/1
@@ -35,7 +35,7 @@ class AccountsController < ApplicationController
 
   # GET /accounts/new
   def new
-    @account = Account.new
+    @account = @project.accounts.build
     @record = [@project, @account]
   end
 

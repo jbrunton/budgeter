@@ -12,9 +12,15 @@ class ProjectSerializer
   def deserialize(string)
     content = YAML.load(string)
     @project.name = content['name']
-    @project.transactions.delete_all
-    content['transactions'].each do |attrs|
-      @project.transactions.create(attrs)
+    @project.ignore_words = content['ignore_words']
+    @project.save
+
+    @project.accounts.delete_all
+    content['accounts'].each do |account_attrs|
+      account = @project.accounts.create(account_attrs.slice('name', 'account_type'))
+      account_attrs['transactions'].each do |transaction_attrs|
+        account.transactions.create(transaction_attrs)
+      end
     end
   end
 
@@ -23,7 +29,15 @@ private
     {
       'name' => @project.name,
       'ignore_words' => @project.ignore_words,
-      'transactions' => @project.transactions.map { |transaction| marshal_transaction(transaction) }
+      'accounts' => @project.accounts.map { |account| marshal_account(account) }
+    }
+  end
+
+  def marshal_account(account)
+    {
+      'name' => account.name,
+      'account_type' => account.account_type,
+      'transactions' => account.transactions.map { |transaction| marshal_transaction(transaction) }
     }
   end
 
@@ -32,6 +46,7 @@ private
     attrs['value'] = currency(attrs['value'])
     attrs['balance'] = currency(attrs['balance'])
     attrs['category'] = transaction.category
+    attrs['predicted_category'] = transaction.predicted_category
     attrs
   end
 end
