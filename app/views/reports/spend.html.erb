@@ -7,18 +7,85 @@
   google.charts.setOnLoadCallback(drawChart);
 
   function drawChart() {
-    var chart = $('#chart_div');
-    chart.css('height', chart.width() * 0.5);
+    var div = $('#chart_div');
+    div.css('height', div.width() * 0.5);
 
-    var data = google.visualization.arrayToDataTable(<%=json_escape @data.to_json.html_safe %>);
+    var url = 'spend_data?' + $('#report_options').serialize();
+    $('#chart_div').animate({opacity: 0});
+    $.get(url, function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        legend: {
+          position: 'right'
+        },
+        chartArea: {
+          width: '75%',
+          height: '85%',
+          left: '5%'
+        },
+        isStacked: true
+      };
 
-    var options = {
-      isStacked: true
-    };
+      var chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
 
-    var chart = new google.visualization.SteppedAreaChart(document.getElementById('chart_div'));
-
-    chart.draw(data, options);
+      chart.draw(data, options);
+      $('#chart_div').animate({opacity: 1});
+    });
   }
+
+  $(function() {
+    var $from_date = $('#from_date'),
+        $to_date = $('#to_date');
+
+    $('#from_date').pickadate({
+      format: 'yyyy-mm-dd',
+      onStart: function() {
+        this.set('select', [
+          <%= @default_start_date.year %>,
+          <%= @default_start_date.month - 1 %>,
+          <%= @default_start_date.day %>
+        ]);
+      }
+    });
+
+    $('#to_date').pickadate({
+      format: 'yyyy-mm-dd',
+      onStart: function() {
+        this.set('select', [
+          <%= @default_end_date.year %>,
+          <%= @default_end_date.month - 1 %>,
+          <%= @default_end_date.day %>
+        ]);
+      }
+    });
+  });
 </script>
+
+<form id="report_options">
+  <div class="row">
+    <div class="col s3">
+      <label for="from_date">From Date</label>
+      <input id="from_date" name="from_date" type="text" class="datepicker" value="<%= @default_start_date.strftime('%Y-%m-%d') %>">
+    </div>
+    <div class="col s3">
+      <label for="to_date">To Date</label>
+      <input id="to_date" name="to_date" type="text" class="datepicker" value="<%= @default_end_date.strftime('%Y-%m-%d') %>">
+    </div>
+    <div class="col s6">
+      <% @project.accounts.each do |account| %>
+          <div>
+            <input id="account_id_<%= account.id %>" type="checkbox" name="account_ids[]" value="<%= account.id %>" checked="checked">
+            <label for="account_id_<%= account.id %>"><%= account.name %></label>
+          </div>
+      <% end %>
+    </div>
+  </div>
+</form>
+
+<div class="row">
+  <div class="col s12">
+    <a onclick="drawChart();" class="btn">Apply</a>
+  </div>
+</div>
+
 <div id="chart_div"></div>
