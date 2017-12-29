@@ -29,38 +29,19 @@ class ReportsController < ApplicationController
   end
 
   def balance
-
+    today = Date.today
+    @default_start_date = today.beginning_of_month
+    @default_end_date = today
   end
 
   def balance_data
-    first_date = @project.transactions.first.date
-    last_date = @project.transactions.last.date
+    first_date = Date.parse(params[:from_date])
+    last_date = Date.parse(params[:to_date])
 
     dates = DateRange.new(first_date, last_date).to_a
-
-    # @data = [['Date'].concat(@project.accounts.map{ |a| a.name }).concat(['Total'])]
-    # while current_date < last_date
-    #   row = [serialize_date(current_date)]
-    #
-    #   account_balances = @project.accounts.map do |a|
-    #     balance = a.balance_on(current_date).to_f
-    #     {
-    #       balance: a.account_type == 'credit_card' ? -balance : balance,
-    #       account_type: a.account_type
-    #     }
-    #   end
-    #   row.concat(account_balances.map{ |a| a[:balance] })
-    #
-    #   total = account_balances
-    #     .map{ |a| a[:balance] }
-    #     .reduce(:+)
-    #   row << total
-    #   @data << row
-    #   current_date = current_date.tomorrow
-    # end
-
     builder = BalanceReportBuilder.new(dates)
     @project.accounts.each { |account| builder.add_balances_from(account) }
+
     render json: builder.build.to_json
   end
 
