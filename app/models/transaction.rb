@@ -3,7 +3,10 @@ require 'digest'
 class Transaction < ApplicationRecord
   belongs_to :account
 
-  default_scope { order(:date, :date_index) }
+  before_save :clean_category
+
+  scope :by_date, ->{ order(:date, :date_index) }
+  scope :by_amount, -> { order('abs(value) desc') }
   scope :between, ->(start_date, end_date) { where(date: start_date..end_date.yesterday) }
   scope :within_month, ->(beginning_of_month) { between(beginning_of_month, beginning_of_month.next_month) }
 
@@ -40,6 +43,13 @@ class Transaction < ApplicationRecord
       md5 << date.strftime('%Y-%m-%d')
       md5 << description
       md5 << value.to_s
+    end
+  end
+
+private
+  def clean_category
+    if category.blank?
+      self.category = nil
     end
   end
 end

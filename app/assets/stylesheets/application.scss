@@ -31,6 +31,27 @@ textarea.yaml-preview {
   font-family: "Source Code Pro", Monaco, monospace;
 }
 
-h3 {
+h1, h2, h3 {
   font-weight: 300;
+  & > b, & > strong {
+    font-weight: 400;
+  }
+}
+
+table.statement-summary {
+  margin-bottom: 2rem;
+  th, td {
+    padding: 0 5px 5px 5px;
+  }
+  th {
+    font-size: 120%;
+    font-weight: 300;
+    font-variant: small-caps;
+    text-align: right;
+  }
+  td {
+    @extend .pink-text, .accent-3;
+    font-size: 140%;
+    font-weight: bold;
+  }
 }

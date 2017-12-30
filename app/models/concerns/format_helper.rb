@@ -9,4 +9,8 @@ module FormatHelper
     date = date.prev_month # JavaScript dates are zero-indexed
     "Date(#{date.strftime('%Y,%-m,%-d')})"
   end
+
+  def percentage(value)
+    number_with_precision(value * 100.0, precision: 1) + '%'
+  end
 end

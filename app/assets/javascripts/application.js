@@ -16,6 +16,12 @@
 //= require_tree .
 
 $(function() {
+  $.ajaxSetup({
+    headers: {
+      'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
   $('button.close').on('click', function () {
     $(this).closest('.panel').fadeOut('normal', function () {
       $(this).remove();

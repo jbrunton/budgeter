@@ -5,8 +5,33 @@ class TransactionsController < ApplicationController
   # GET /transactions
   # GET /transactions.json
   def index
-    @transactions = @account.transactions
     @project = @account.project
+    first_date = @account.transactions.first.date.beginning_of_month
+    last_date = @account.transactions.last.date
+    @month_options = DateRange.new(first_date,last_date, true).to_a
+      .map{ |date| [date.strftime('%b %Y'), date.strftime('%Y-%m-%d')] }
+    @sort_options = [['Date', 'date'], ['Amount', 'amount']]
+  end
+
+  def statement
+    @transactions = @account.transactions.within_month(Date.parse(params[:month]))
+    if params[:sort_by] == 'amount'
+      @transactions = @transactions.by_amount
+    else
+      @transactions = @transactions.by_date
+    end
+
+    render layout: false
+  end
+
+  def statement_summary
+    @transactions = @account.transactions.within_month(Date.parse(params[:month]))
+
+    categorized_transactions = @transactions.select{ |t| !t.category.blank? }
+    @categorized_count = categorized_transactions.size.to_f / @transactions.size
+    @categorized_spend = categorized_transactions.map{ |t| t.value.abs }.reduce(0, :+) / @transactions.map{ |t| t.value.abs }.reduce(0, :+)
+
+    render layout: false
   end
 
   # GET /transactions/1
