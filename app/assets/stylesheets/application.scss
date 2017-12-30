@@ -50,15 +50,19 @@ table.summary {
     text-align: right;
   }
   td {
-    &.unverified {
+    .unverified {
       @extend .pink-text, .accent-3;
     }
-    &.verified {
+    .verified {
       @extend .green-text;
     }
     font-size: 140%;
     font-weight: bold;
   }
+}
+
+.light {
+  font-weight: 300;
 }
 
 .progress.verification_state {
