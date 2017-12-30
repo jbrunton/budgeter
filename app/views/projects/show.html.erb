@@ -31,7 +31,6 @@
     </ul>
   </div>
   <div class="col s6">
-    <h5>Status</h5>
     <table class="summary">
       <tr>
         <th>
@@ -67,6 +66,25 @@
         </td>
       </tr>
     </table>
+
+    <hr>
+    <h4>
+      Accounts
+      <%= link_to 'More →', project_accounts_path(@project), class: 'btn-flat right' %>
+    </h4>
+    <% @project.accounts.each do |account| %>
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title"><%= account.name %></span>
+            <%= I18n.t account.account_type %>
+          </div>
+          <div class="card-action">
+            <%= link_to 'Details', account %>
+            <%= link_to 'Transactions', account_transactions_path(account) %>
+          </div>
+        </div>
+    <% end %>
+
   </div>
 </div>
 
