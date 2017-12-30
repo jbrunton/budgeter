@@ -29,4 +29,5 @@ $(function() {
   });
 
   $('select').material_select();
+  $('.modal').modal();
 });

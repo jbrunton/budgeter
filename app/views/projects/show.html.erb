@@ -90,3 +90,51 @@
 
 <%= link_to 'Edit', edit_project_path(@project) %> |
 <%= link_to 'Back', projects_path %>
+
+<div class="fixed-action-btn">
+  <a class="btn-floating btn-large red">
+    <i class="large material-icons">mode_edit</i>
+  </a>
+  <ul>
+    <li>
+      <a href="<%= new_project_account_path(@project) %>" class="btn-floating red tooltipped" data-position="left" data-tooltip="add account">
+        <i class="material-icons">add_box</i>
+      </a>
+    </li>
+    <li>
+      <a href="#import-statements-modal" class="btn-floating yellow darken-2 tooltipped modal-trigger" data-position="left" data-tooltip="import statements">
+        <i class="material-icons">file_upload</i>
+      </a>
+    </li>
+    <li>
+      <a href="<%= backup_project_path(@project) %>" class="btn-floating green tooltipped" data-position="left" data-tooltip="backup / restore">
+        <i class="material-icons">archive</i>
+      </a>
+    </li>
+    <li>
+      <a href="<%= train_project_path(@project) %>" class="btn-floating blue tooltipped" data-position="left" data-tooltip="train classifier">
+        <i class="material-icons">school</i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<!-- Modal Structure -->
+<div id="import-statements-modal" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Import Statements</h4>
+    <p>Which account do you want to import statements for?</p>
+    <div class="collection">
+    <% @project.accounts.each do |account| %>
+        <a href="<%= import_statement_account_path(account) %>" class="collection-item">
+          <b><%= account.name %></b>
+          <br>
+          <%= I18n.t account.account_type %>
+        </a>
+    <% end %>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Cancel</a>
+  </div>
+</div>
