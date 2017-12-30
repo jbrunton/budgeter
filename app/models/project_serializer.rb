@@ -49,6 +49,7 @@ private
     attrs['balance'] = currency(attrs['balance'])
     attrs['category'] = transaction.category
     attrs['predicted_category'] = transaction.predicted_category
+    attrs['verified'] = transaction.verified
     attrs
   end
 end

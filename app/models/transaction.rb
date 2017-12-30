@@ -13,7 +13,6 @@ class Transaction < ApplicationRecord
   DATA_ATTRIBUTES = [
     'date',
     'date_index',
-    'transaction_type',
     'description',
     'value',
     'balance'
@@ -43,6 +42,14 @@ class Transaction < ApplicationRecord
       md5 << date.strftime('%Y-%m-%d')
       md5 << description
       md5 << value.to_s
+    end
+  end
+
+  def verified_status
+    if !category.blank? || verified
+      :verified
+    else
+      :unverified
     end
   end
 

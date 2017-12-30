@@ -7,7 +7,7 @@
 <script>
   function loadStatement() {
     var query = $('#statement_options').serialize();
-    $('#transactions').load(`transactions/statement?${query}`, null, initializeCategoryFields);
+    $('#transactions').load(`transactions/statement?${query}`, null, initializeCategoryForms);
   }
 
   function loadSummary() {
@@ -15,13 +15,20 @@
     $('#summary').load(`transactions/statement_summary?${query}`);
   }
 
-  function initializeCategoryFields() {
+  function initializeCategoryForms() {
+    function updateRow($tr, response) {
+      var disableCheckbox = response.category != null;
+      $tr.find('form.verified input[type=checkbox]').prop('disabled', disableCheckbox);
+      $tr.removeClass('verified').addClass(response.verified_status);
+    }
+
     $('.transactions form.category input[type=text]').change(function() {
-      var action = $(this).parent('form')[0].action + '.json';
-      var data = $(this).parent('form').serializeArray();
+      var $this = $(this);
+      var action = $this.closest('form')[0].action + '.json';
+      var data = $this.closest('form').serializeArray();
       $.post(action, data, function(response) {
         var autocompleteData = {};
-        response.forEach(function(val) {
+        response.project_categories.forEach(function(val) {
           autocompleteData[val] = null;
         });
         $('.transactions form.category input[type=text]').autocomplete({
@@ -33,6 +40,16 @@
           minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
         });
         loadSummary();
+        updateRow($this.closest('tr'), response);
+      }, 'json');
+    });
+    $('.transactions form.verified input[type=checkbox]').change(function() {
+      var $this = $(this);
+      var action = $this.closest('form')[0].action + '.json';
+      var data = $this.closest('form').serializeArray();
+      $.post(action, data, function(response) {
+        loadSummary();
+        updateRow($this.closest('tr'), response);
       }, 'json');
     });
     $('.transactions form.category input[type=text]').autocomplete({
