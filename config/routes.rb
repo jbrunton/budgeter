@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       resources :transactions, shallow: true do
         collection do
           get 'statement'
+          get 'statement_summary'
         end
       end
       member do

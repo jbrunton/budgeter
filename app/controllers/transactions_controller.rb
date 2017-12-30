@@ -20,6 +20,17 @@ class TransactionsController < ApplicationController
     else
       @transactions = @transactions.by_date
     end
+
+    render layout: false
+  end
+
+  def statement_summary
+    @transactions = @account.transactions.within_month(Date.parse(params[:month]))
+
+    categorized_transactions = @transactions.select{ |t| !t.category.nil? }
+    @categorized_count = categorized_transactions.size.to_f / @transactions.size
+    @categorized_spend = categorized_transactions.map{ |t| t.value.abs }.reduce(0, :+) / @transactions.map{ |t| t.value.abs }.reduce(0, :+)
+
     render layout: false
   end
 
