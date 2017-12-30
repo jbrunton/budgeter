@@ -33,26 +33,10 @@ class ReportsController < ApplicationController
           .sum("case accounts.account_type when 'credit_card' then -value else value end")
         month_spend < 0 ? -month_spend.to_f : 0
       end
-      builder.number({ label: category }, category_spend_data)
+      builder.number({ label: category }, category_spend_data) if category_spend_data.any?{ |value| value > 0 }
     end
 
     render json: builder.build
-
-    # @data = [['Month'].concat(categories.map{ |k, _| k })]
-    # while current_month < last_date
-    #   next_month = current_month.next_month
-    #   row = [current_month.strftime('%b %Y')]
-    #   categories.each do |category, _|
-    #     month_spend = @project.transactions
-    #       .within_month(current_month)
-    #       .where('coalesce(category, predicted_category) = ?', category)
-    #       .joins(:account)
-    #       .sum("case accounts.account_type when 'credit_card' then -value else value end")
-    #     row << (month_spend < 0 ? -month_spend.to_f : 0)
-    #   end
-    #   @data << row
-    #   current_month = next_month
-    # end
   end
 
   def balance
