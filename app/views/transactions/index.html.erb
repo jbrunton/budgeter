@@ -7,7 +7,7 @@
 <script>
   function loadStatement() {
     var query = $('#statement_options').serialize();
-    $('#transactions').load(`transactions/statement?${query}`);
+    $('#transactions').load(`transactions/statement?${query}`, null, initializeCategoryFields);
   }
 
   function loadSummary() {
@@ -15,10 +15,10 @@
     $('#summary').load(`transactions/statement_summary?${query}`);
   }
 
-  $(function() {
+  function initializeCategoryFields() {
     $('.transactions form.category input[type=text]').change(function() {
       var action = $(this).parent('form')[0].action + '.json';
-      var data = $(this).parent('form').serialize();
+      var data = $(this).parent('form').serializeArray();
       $.post(action, data, function(response) {
         var autocompleteData = {};
         response.forEach(function(val) {
@@ -32,7 +32,8 @@
           },
           minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
         });
-      });
+        loadSummary();
+      }, 'json');
     });
     $('.transactions form.category input[type=text]').autocomplete({
       data: <%=json_escape @project.categories.map{ |c| [c, nil] }.to_h.to_json.html_safe %>,
@@ -49,6 +50,10 @@
     $('.transactions form.category input[type=text]').focusout(function() {
       $(this).closest('tr').removeClass('highlight');
     });
+  }
+
+  $(function() {
+
 
     loadStatement();
     loadSummary();

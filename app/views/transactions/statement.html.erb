@@ -22,7 +22,7 @@
           <td class="numeric"><%= currency transaction.value %></td>
           <td class="numeric"><%= currency transaction.balance %></td>
           <td>
-            <%= form_with(model: transaction, remote: true, class: 'category') do |form| %>
+            <%= form_with(model: transaction, class: 'category') do |form| %>
                 <%= form.text_field :category, { autocomplete: 'off' } %>
             <% end %>
           </td>

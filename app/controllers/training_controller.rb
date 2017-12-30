@@ -57,7 +57,7 @@ private
   end
 
   def partition_transactions
-    categorised_transactions = @project.transactions.select{ |t| !t.category.nil? }
+    categorised_transactions = @project.transactions.select{ |t| !t.category.blank? }
     transactions_by_category = categorised_transactions.group_by{ |t| t.category }
     training_transactions = []
     test_transactions = []
