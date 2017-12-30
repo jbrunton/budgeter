@@ -1,5 +1,25 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories, :verification_state]
+
+  def verification_state
+    verification_state = @project.verification_state
+    builder = DataTableBuilder.new
+      .column({ type: 'string', label: 'Verified' }, ['Yes', 'No'])
+      .number({ label: 'Spend'}, [verification_state[:verified_spend], verification_state[:unverified_spend]])
+    render json: builder.build
+
+
+    # var data = google.visualization.arrayToDataTable([
+    #   ['Task', 'Hours per Day'],
+    #   ['Work',     11],
+    #   ['Eat',      2],
+    #   ['Commute',  2],
+    #   ['Watch TV', 2],
+    #   ['Sleep',    7]
+    # ]);
+    #
+
+  end
 
   def categories
     respond_to do |format|

@@ -2,6 +2,8 @@ class Project < ApplicationRecord
   has_many :accounts
   has_many :transactions, through: :accounts
 
+  include VerificationState
+
   def scan_statement_transactions
     scan_dir = File.join(directory, 'statements')
     statements = Dir.glob("#{scan_dir}/*.csv").map do |filename|
