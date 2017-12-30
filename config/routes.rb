@@ -20,7 +20,11 @@ Rails.application.routes.draw do
     end
 
     resources :accounts, shallow: true do
-      resources :transactions, shallow: true
+      resources :transactions, shallow: true do
+        collection do
+          get 'statement'
+        end
+      end
       member do
         get 'import_statement'
         post 'upload_statement'

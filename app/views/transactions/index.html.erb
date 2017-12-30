@@ -2,9 +2,14 @@
 
 <p id="notice"><%= notice %></p>
 
-<h1>Transactions</h1>
+<h2><%= @account.name %></h2>
 
 <script>
+  function loadStatement() {
+    var query = $('#statement_options').serialize();
+    $('#transactions').load(`transactions/statement?${query}`);
+  }
+
   $(function() {
     $('.transactions form.category input[type=text]').change(function() {
       var action = $(this).parent('form')[0].action + '.json';
@@ -39,39 +44,25 @@
     $('.transactions form.category input[type=text]').focusout(function() {
       $(this).closest('tr').removeClass('highlight');
     });
+
+    loadStatement();
+    $('#statement_options').change(loadStatement);
   });
 </script>
 
-<table class="transactions">
-  <thead>
-    <tr>
-      <th class="date">Date</th>
-      <th class="transaction_type">Type</th>
-      <th class="description">Description</th>
-      <th class="value">Value</th>
-      <th class="balance">Balance</th>
-      <th class="category">Category</th>
-      <th class="predicted_category">Predicted</th>
-    </tr>
-  </thead>
+<form id="statement_options" class="row">
+  <div class="input-field col s4">
+    <%= select_tag 'month', options_for_select(@month_options, @month_options.last[1]), id: 'month' %>
+    <label>Month</label>
+  </div>
+  <div class="input-field col s4">
+    <%= select_tag 'sort_by', options_for_select(@sort_options), id: 'sort_by' %>
+    <label>Sort by</label>
+  </div>
+</form>
 
-  <tbody>
-    <% @transactions.each do |transaction| %>
-      <tr>
-        <td><%= transaction.date.strftime('%-d %b %y') %></td>
-        <td><%= transaction.transaction_type %></td>
-        <td><%= transaction.description %></td>
-        <td class="numeric"><%= currency transaction.value %></td>
-        <td class="numeric"><%= currency transaction.balance %></td>
-        <td>
-          <%= form_with(model: transaction, remote: true, class: 'category') do |form| %>
-            <%= form.text_field :category, { autocomplete: 'off' } %>
-          <% end %>
-        </td>
-        <td><%= transaction.predicted_category%></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<div id="transactions">
+
+</div>
 
 <br>

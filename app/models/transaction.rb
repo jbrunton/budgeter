@@ -3,7 +3,8 @@ require 'digest'
 class Transaction < ApplicationRecord
   belongs_to :account
 
-  default_scope { order(:date, :date_index) }
+  scope :by_date, ->{ order(:date, :date_index) }
+  scope :by_amount, -> { order('abs(value) desc') }
   scope :between, ->(start_date, end_date) { where(date: start_date..end_date.yesterday) }
   scope :within_month, ->(beginning_of_month) { between(beginning_of_month, beginning_of_month.next_month) }
 
