@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 20171226173302) do
     t.decimal "balance"
     t.string "category"
     t.string "predicted_category"
+    t.boolean "verified"
     t.integer "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

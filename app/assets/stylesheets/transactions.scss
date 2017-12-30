@@ -15,14 +15,14 @@ table.transactions {
   }
 
   tr {
-    &.correct {
+    &.highlight, &.verified.highlight {
+      @extend .pink, .lighten-5;
+    }
+    &.correct, &.verified {
       @extend .green, .lighten-5;
     }
     &.incorrect {
       @extend .red, .lighten-5;
-    }
-    &.highlight {
-      @extend .pink, .lighten-5;
     }
   }
 
@@ -31,30 +31,27 @@ table.transactions {
       width: 8%;
     }
 
-    &.account_name {
-      width: 10%;
-    }
-
-    &.transaction_type {
-      width: 6%;
-    }
-    // total: 24%
-
     &.description {
-      width: 40%;
+      width: 38%;
     }
+    // total: 46%;
 
     &.value, &.balance {
       width: 8%;
     }
-    // total: 72%;
+    // total: 62%;
 
     &.category {
-      width: 14%;
+      width: 15%;
     }
 
     &.predicted_category {
-      width: 14%;
+      width: 15%;
+    }
+    // total: 92%;
+
+    &.verified {
+      width: 8%;
     }
   }
 

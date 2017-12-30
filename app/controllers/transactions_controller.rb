@@ -27,9 +27,9 @@ class TransactionsController < ApplicationController
   def statement_summary
     @transactions = @account.transactions.within_month(Date.parse(params[:month]))
 
-    categorized_transactions = @transactions.select{ |t| !t.category.blank? }
-    @categorized_count = categorized_transactions.size.to_f / @transactions.size
-    @categorized_spend = categorized_transactions.map{ |t| t.value.abs }.reduce(0, :+) / @transactions.map{ |t| t.value.abs }.reduce(0, :+)
+    verified_transactions = @transactions.select{ |t| !t.category.blank? || t.verified }
+    @verified_count = verified_transactions.size.to_f / @transactions.size
+    @verified_spend = verified_transactions.map{ |t| t.value.abs }.reduce(0, :+) / @transactions.map{ |t| t.value.abs }.reduce(0, :+)
 
     render layout: false
   end
@@ -70,7 +70,7 @@ class TransactionsController < ApplicationController
     respond_to do |format|
       if @transaction.update(transaction_params)
         format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
-        format.json { render json: @account.project.categories, status: :ok }
+        format.json { render 'transactions/show.json.jbuilder' }
       else
         format.html { render :edit }
         format.json { render json: @transaction.errors, status: :unprocessable_entity }
@@ -119,6 +119,6 @@ class TransactionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def transaction_params
-      params.require(:transaction).permit(:date, :type, :description, :value, :balance, :category)
+      params.require(:transaction).permit(:date, :type, :description, :value, :balance, :category, :verified)
     end
 end
