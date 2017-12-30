@@ -3,8 +3,6 @@ Rails.application.routes.draw do
 
   resources :projects do
     member do
-      get 'verification_state'
-
       get 'backup', to: 'backup#index'
       get 'backup/download', to: 'backup#download'
       post 'backup/restore', to: 'backup#restore'

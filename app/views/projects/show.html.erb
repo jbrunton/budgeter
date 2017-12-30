@@ -31,35 +31,32 @@
     </ul>
   </div>
   <div class="col s4">
-    <p>
-      <strong>Directory:</strong>
-      <%= @project.directory %>
-    </p>
-
-    <script type="application/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawVerificationStateChart);
-      function drawVerificationStateChart() {
-        $.get('<%= verification_state_project_path(@project) %>', function(jsonData) {
-          var data = new google.visualization.DataTable(jsonData);
-
-          var options = {
-            pieSliceText: 'label',
-            slices: {
-              0: { color: '#66BB6A', offset: 0.1 },
-              1: { color: '#EF5350' }
-            }
-          };
-
-          var chart = new google.visualization.PieChart(document.getElementById('verification_state_chart'));
-
-          chart.draw(data, options);
-        });
-      }
-    </script>
-    <div id="verification_state_chart">
-
-    </div>
+    <h5>Status</h5>
+    <table class="summary">
+      <tr>
+        <th>
+          verified spend
+        </th>
+        <td class="verified">
+          <b><%= currency(@verification_state[:verified_spend]) %></b>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          unverified spend
+        </th>
+        <td class="unverified">
+          <b><%= currency(@verification_state[:unverified_spend]) %></b>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="progress verification_state">
+            <div class="determinate" style="width: <%= @verification_state[:percent_verified_spend] %>%"></div>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 </div>
 

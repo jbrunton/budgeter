@@ -31,14 +31,14 @@ textarea.yaml-preview {
   font-family: "Source Code Pro", Monaco, monospace;
 }
 
-h1, h2, h3 {
+h1, h2, h3, h4, h5 {
   font-weight: 300;
   & > b, & > strong {
     font-weight: 400;
   }
 }
 
-table.statement-summary {
+table.summary {
   margin-bottom: 2rem;
   th, td {
     padding: 0 5px 5px 5px;
@@ -50,8 +50,19 @@ table.statement-summary {
     text-align: right;
   }
   td {
-    @extend .pink-text, .accent-3;
+    &.unverified {
+      @extend .pink-text, .accent-3;
+    }
+    &.verified {
+      @extend .green-text;
+    }
     font-size: 140%;
     font-weight: bold;
+  }
+}
+
+.progress.verification_state {
+  .determinate {
+    background-color: #66bb6a
   }
 }
