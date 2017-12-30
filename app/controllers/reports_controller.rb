@@ -1,66 +1,63 @@
 class ReportsController < ApplicationController
   before_action :set_project
 
-  def spend
-    current_month = @project.transactions.first.date.at_beginning_of_month
-    last_date = @project.transactions.last.date
+  include FormatHelper
 
+  def spend
+    today = Date.today
+    @default_start_date = today - 360.days
+    @default_end_date = today
+  end
+
+  def spend_data
     categories = Transaction.where(account: @project.accounts)
       .group('coalesce(category, predicted_category)')
       .sum(:value)
-      .sort_by { |_, v| v }
-      .to_h
+      .sort_by { |_, v| v.abs }
+      .map{ |category, _| category }
+      .to_a
 
-    @data = [['Month'].concat(categories.map{ |k, _| k })]
-    while current_month < last_date
-      next_month = current_month.next_month
-      row = [current_month.strftime('%b %Y')]
-      categories.each do |category, _|
+    first_date = Date.parse(params[:from_date]).beginning_of_month
+    last_date = Date.parse(params[:to_date]).beginning_of_month
+    dates = DateRange.new(first_date, last_date, true).to_a
+
+    builder = DataTableBuilder.new
+    builder.column({ type: 'date', label: 'Date' }, dates.map{ |d| serialize_date(d)})
+    categories.each do |category|
+      category_spend_data = dates.map do |date|
         month_spend = @project.transactions
-          .within_month(current_month)
-          .where('coalesce(category, predicted_category) = ?', category)
+          .within_month(date)
           .joins(:account)
+          .where('coalesce(category, predicted_category) = ?', category)
+          .where('account_id in (?)', params[:account_ids])
           .sum("case accounts.account_type when 'credit_card' then -value else value end")
-        row << (month_spend < 0 ? -month_spend.to_f : 0)
+        month_spend < 0 ? -month_spend.to_f : 0
       end
-      @data << row
-      current_month = next_month
+      builder.number({ label: category }, category_spend_data) if category_spend_data.any?{ |value| value > 0 }
     end
+
+    render json: builder.build
   end
 
   def balance
-    first_date = @project.transactions.first.date
-    current_date = first_date
-    last_date = @project.transactions.last.date
+    today = Date.today
+    @default_start_date = today - 90.days
+    @default_end_date = today
+  end
 
-    @data = [['Date'].concat(@project.accounts.map{ |a| a.name }).concat(['Total'])]
-    while current_date < last_date
-      row = [serialize_date(current_date)]
+  def balance_data
+    first_date = Date.parse(params[:from_date])
+    last_date = Date.parse(params[:to_date])
 
-      account_balances = @project.accounts.map do |a|
-        balance = a.balance_on(current_date).to_f
-        {
-          balance: a.account_type == 'credit_card' ? -balance : balance,
-          account_type: a.account_type
-        }
-      end
-      row.concat(account_balances.map{ |a| a[:balance] })
+    dates = DateRange.new(first_date, last_date).to_a
+    builder = BalanceReportBuilder.new(dates)
+    @project.accounts.each { |account| builder.add_balances_from(account) }
 
-      total = account_balances
-        .map{ |a| a[:balance] }
-        .reduce(:+)
-      row << total
-      @data << row
-      current_date = current_date.tomorrow
-    end
+    render json: builder.build(params[:account_ids] || [], params[:show_total]).to_json
   end
 
 private
   def set_project
     @project = Project.find(params[:id])
-  end
-
-  def serialize_date(date)
-    "Date('#{date.strftime('%Y-%m-%d')}')"
   end
 end

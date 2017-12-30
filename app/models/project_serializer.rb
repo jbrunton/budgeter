@@ -1,5 +1,5 @@
 class ProjectSerializer
-  include CurrencyHelper
+  include FormatHelper
 
   def initialize(project)
     @project = project
