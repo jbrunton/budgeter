@@ -25,7 +25,7 @@ class StatementsController < ApplicationController
       @transactions = @transactions.by_date
     end
 
-    render 'transactions/statement', layout: false
+    render 'transactions', layout: false
   end
 
   def summary
