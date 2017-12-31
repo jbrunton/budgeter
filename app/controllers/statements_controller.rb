@@ -5,6 +5,10 @@ class StatementsController < ApplicationController
     @statements = @project.statements.reverse
   end
 
+  def show
+    @statement = Statement.new(@project, Date.parse(params[:date]))
+  end
+
   def import
 
   end

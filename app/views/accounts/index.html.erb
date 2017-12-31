@@ -26,7 +26,8 @@
 
         </div>
         <div class="col s6">
-          <%= render partial: 'shared/verification_status', locals: { verification_state: account.verification_state } %>
+          <%= render partial: 'shared/verification_status',
+              locals: { verification_state: account.verification_state, show_unverified_spend: true } %>
         </div>
       </div>
   <% end %>

@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   root 'projects#index'
 
+  get 'projects/:id/statements', to: 'statements#index', as: 'project_statements'
+  get 'projects/:id/statements/:date', to: 'statements#show', as: 'project_statement'
+
+
   resources :projects do
     member do
       get 'backup', to: 'backup#index'
@@ -17,8 +21,6 @@ Rails.application.routes.draw do
       get 'reports/spend_data', to: 'reports#spend_data'
       get 'reports/balance', to: 'reports#balance'
       get 'reports/balance_data', to: 'reports#balance_data'
-
-      get 'statements', to: 'statements#index'
     end
 
     resources :accounts, shallow: true do

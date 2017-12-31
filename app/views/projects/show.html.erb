@@ -83,7 +83,8 @@
     </div>
   </div>
   <div class="col s6">
-    <%= render partial: 'shared/verification_status', locals: { verification_state: @verification_state } %>
+    <%= render partial: 'shared/verification_status',
+        locals: { verification_state: @verification_state, show_unverified_spend: true } %>
   </div>
 </div>
 
