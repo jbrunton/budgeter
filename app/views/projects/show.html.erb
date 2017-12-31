@@ -2,7 +2,14 @@
 
 <p id="notice"><%= notice %></p>
 
-<h3><%= @project.name %></h3>
+<div class="row">
+  <div class="col s10">
+    <h3><%= @project.name %></h3>
+  </div>
+  <div class="col s2">
+    <%= link_to 'Edit', edit_project_path(@project), class: 'btn-flat right' %>
+  </div>
+</div>
 
 <div class="row">
   <div class="col s3">
@@ -87,9 +94,6 @@
 
   </div>
 </div>
-
-<%= link_to 'Edit', edit_project_path(@project) %> |
-<%= link_to 'Back', projects_path %>
 
 <div class="fixed-action-btn">
   <a class="btn-floating btn-large red">
