@@ -5,6 +5,7 @@
     var $select = $('select[name=month]');
     var date_key = $select.val();
     var query = $('#statement_options').serialize();
+    $('#transactions').animate({opacity: 0});
     $('#transactions').load(`${date_key}/transactions?${query}`, null, initializeCategoryForms);
   }
 
@@ -14,6 +15,8 @@
   }
 
   function initializeCategoryForms() {
+    $('#transactions').animate({opacity: 1});
+
     function updateRow($tr, response) {
       var disableCheckbox = response.category != null;
       $tr.find('form.verified input[type=checkbox]').prop('disabled', disableCheckbox);
@@ -78,7 +81,7 @@
     $nextStatement.text('');
     var $nextOption = $select.find(':selected').next();
     if ($nextOption.size() > 0) {
-      $nextStatement.text($nextOption.text());
+      $nextStatement.text($nextOption.text() + ' →');
       $nextStatement.click(function(event) {
         event.preventDefault();
         $select.val($nextOption.val()).change();
@@ -89,7 +92,7 @@
     $prevStatement.text('');
     var $prevOption = $select.find(':selected').prev();
     if ($prevOption.size() > 0) {
-      $prevStatement.text($prevOption.text());
+      $prevStatement.text('← ' + $prevOption.text());
       $prevStatement.click(function(event) {
         event.preventDefault();
         $select.val($prevOption.val()).change();
@@ -111,6 +114,8 @@
   });
 </script>
 
+<a class="btn-flat" id="prev_statement" href="#"></a>
+<a class="btn-flat right" id="next_statement" href="#"></a>
 <h1>
   <%= @statement.name %>
 </h1>
@@ -127,8 +132,6 @@
         <label>Sort by</label>
       </div>
     </form>
-    <a id="prev_statement" href="#"></a>
-    <a id="next_statement" href="#" class="right"></a>
   </div>
   <div class="col s6">
     <%= render partial: 'shared/verification_status',
