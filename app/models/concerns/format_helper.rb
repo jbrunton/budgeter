@@ -13,4 +13,8 @@ module FormatHelper
   def percentage(value)
     number_with_precision(value * 100.0, precision: 1) + '%'
   end
+
+  def date_value(date)
+    date.strftime('%Y-%m-%d')
+  end
 end
