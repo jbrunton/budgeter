@@ -1,17 +1,32 @@
 class Statement
-  attr_reader :filename
   attr_reader :project
+  attr_reader :start_date
 
-  def initialize(project, filename)
+  include VerificationState
+
+  def initialize(project, start_date)
     @project = project
-    @filename = filename
+    @start_date = start_date
   end
 
-  def scan_transactions
-    Parser.read(File.join(project.directory, 'statements', filename)).each_with_index.map do |attrs, index|
-      attrs[:statement_name] = filename
-      attrs[:statement_index] = index
-      project.transactions.build(attrs)
+  def name
+    start_date.strftime('%b %Y')
+  end
+
+  def transactions
+    @project.transactions
+      .within_month(@start_date)
+  end
+
+  def self.for(project)
+    transactions = project.transactions.by_date
+    first_date = transactions.first.date.beginning_of_month
+    last_date = transactions.last.date
+
+    dates = DateRange.new(first_date, last_date, true).to_a
+
+    dates.map do |date|
+      Statement.new(project, date)
     end
   end
 end

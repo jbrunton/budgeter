@@ -17,6 +17,8 @@ Rails.application.routes.draw do
       get 'reports/spend_data', to: 'reports#spend_data'
       get 'reports/balance', to: 'reports#balance'
       get 'reports/balance_data', to: 'reports#balance_data'
+
+      get 'statements', to: 'statements#index'
     end
 
     resources :accounts, shallow: true do

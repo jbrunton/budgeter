@@ -4,6 +4,10 @@ class Project < ApplicationRecord
 
   include VerificationState
 
+  def statements
+    Statement.for(self)
+  end
+
   def scan_statement_transactions
     scan_dir = File.join(directory, 'statements')
     statements = Dir.glob("#{scan_dir}/*.csv").map do |filename|

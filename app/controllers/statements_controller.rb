@@ -1,6 +1,10 @@
 class StatementsController < ApplicationController
   before_action :set_project
 
+  def index
+    @statements = @project.statements.reverse
+  end
+
   def import
 
   end
