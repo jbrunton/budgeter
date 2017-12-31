@@ -5,7 +5,7 @@ class ReportsController < ApplicationController
 
   def spend
     today = Date.today
-    @default_start_date = today - 360.days
+    @default_start_date = (today - 360.days).beginning_of_month
     @default_end_date = today
   end
 
