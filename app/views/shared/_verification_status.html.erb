@@ -8,12 +8,12 @@
     </td>
     <td class="right-align number">
           <span class="verified">
-            <%= currency(@verification_state[:verified_spend]) %>
+            <%= currency(verification_state[:verified_spend]) %>
           </span>
     </td>
     <td class="right-align">
           <span class="light">
-          (<%= @verification_state[:percent_verified_spend].round %>%)
+          (<%= verification_state[:percent_verified_spend].round %>%)
           </span>
     </td>
   </tr>
@@ -26,19 +26,19 @@
     </td>
     <td class="right-align number">
           <span class="unverified">
-            <%= currency(@verification_state[:unverified_spend]) %>
+            <%= currency(verification_state[:unverified_spend]) %>
           </span>
     </td>
     <td class="right-align">
           <span class="light">
-          (<%= @verification_state[:percent_unverified_spend].round %>%)
+          (<%= verification_state[:percent_unverified_spend].round %>%)
           </span>
     </td>
   </tr>
   <tr>
     <td colspan="4">
       <div class="progress verification_state">
-        <div class="determinate" style="width: <%= @verification_state[:percent_verified_spend] %>%"></div>
+        <div class="determinate" style="width: <%= verification_state[:percent_verified_spend] %>%"></div>
       </div>
     </td>
   </tr>
