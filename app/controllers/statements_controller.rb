@@ -7,14 +7,25 @@ class StatementsController < ApplicationController
 
   def show
     @statement = Statement.new(@project, Date.parse(params[:date]))
-    @prev_statement = @next_statement = nil
-    @project.statements.each do |statement|
-      if statement.start_date == @statement.start_date.prev_month
-        @prev_statement = statement
-      elsif statement.start_date == @statement.start_date.next_month
-        @next_statement = statement
-      end
+
+    first_date = @project.transactions.first.date.beginning_of_month
+    last_date = @project.transactions.last.date
+    @month_options = DateRange.new(first_date,last_date, true).to_a
+      .map{ |date| [date.strftime('%b %Y'), date.strftime('%Y-%m-%d')] }
+    @sort_options = [['Date', 'date'], ['Amount', 'amount']]
+  end
+
+  def transactions
+    @statement = Statement.new(@project, Date.parse(params[:month]))
+
+    @transactions = @project.transactions.within_month(Date.parse(params[:month]))
+    if params[:sort_by] == 'amount'
+      @transactions = @transactions.by_amount
+    else
+      @transactions = @transactions.by_date
     end
+
+    render 'transactions/statement', layout: false
   end
 
   def import

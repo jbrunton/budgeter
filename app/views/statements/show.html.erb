@@ -1,19 +1,143 @@
 <% breadcrumb :statement, @statement %>
 
-<% unless @prev_statement.nil? %>
-    <%= link_to "← #{@prev_statement.name}", @prev_statement.path, class: 'left' %>
-<% end %>
-<% unless @next_statement.nil? %>
-    <%= link_to "#{@next_statement.name} →", @next_statement.path, class: 'right' %>
-<% end %>
-<h1><%= @statement.name %></h1>
+<script>
+  function loadStatement() {
+    var $select = $('select[name=month]');
+    var date_key = $select.val();
+    var query = $('#statement_options').serialize();
+    $('#transactions').load(`${date_key}/transactions?${query}`, null, initializeCategoryForms);
+  }
+
+  function loadSummary() {
+    var query = $('#statement_options').serialize();
+    $('#summary').load(`transactions/statement_summary?${query}`);
+  }
+
+  function initializeCategoryForms() {
+    function updateRow($tr, response) {
+      var disableCheckbox = response.category != null;
+      $tr.find('form.verified input[type=checkbox]').prop('disabled', disableCheckbox);
+      $tr.removeClass('verified').addClass(response.verified_status);
+    }
+
+    $('.transactions form.category input[type=text]').change(function() {
+      var $this = $(this);
+      var action = $this.closest('form')[0].action + '.json';
+      var data = $this.closest('form').serializeArray();
+      $.post(action, data, function(response) {
+        var autocompleteData = {};
+        response.project_categories.forEach(function(val) {
+          autocompleteData[val] = null;
+        });
+        $('.transactions form.category input[type=text]').autocomplete({
+          data: autocompleteData,
+          limit: 20, // The max amount of results that can be shown at once. Default: Infinity.
+          onAutocomplete: function(val) {
+            // Callback function when value is autcompleted.
+          },
+          minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
+        });
+        loadSummary();
+        updateRow($this.closest('tr'), response);
+      }, 'json');
+    });
+    $('.transactions form.verified input[type=checkbox]').change(function() {
+      var $this = $(this);
+      var action = $this.closest('form')[0].action + '.json';
+      var data = $this.closest('form').serializeArray();
+      $.post(action, data, function(response) {
+        loadSummary();
+        updateRow($this.closest('tr'), response);
+      }, 'json');
+    });
+    $('.transactions form.category input[type=text]').autocomplete({
+      data: <%=json_escape @project.categories.map{ |c| [c, nil] }.to_h.to_json.html_safe %>,
+      limit: 20, // The max amount of results that can be shown at once. Default: Infinity.
+      onAutocomplete: function(val) {
+        // Callback function when value is autcompleted.
+      },
+      minLength: 1, // The minimum length of the input for the autocomplete to start. Default: 1.
+    });
+
+    $('.transactions form.category input[type=text]').focus(function() {
+      $(this).closest('tr').addClass('highlight');
+    });
+    $('.transactions form.category input[type=text]').focusout(function() {
+      $(this).closest('tr').removeClass('highlight');
+    });
+  }
+
+  function initializeSelect() {
+    var $select = $('select[name=month]');
+    $select.material_select();
+
+    var statement_name = $select.find(':selected').text();
+    $('#statement_name').text(statement_name);
+
+    var $nextStatement = $('#next_statement');
+    $nextStatement.text('');
+    var $nextOption = $select.find(':selected').next();
+    if ($nextOption.size() > 0) {
+      $nextStatement.text($nextOption.text());
+      $nextStatement.click(function(event) {
+        event.preventDefault();
+        $select.val($nextOption.val()).change();
+      });
+    }
+
+    var $prevStatement = $('#prev_statement');
+    $prevStatement.text('');
+    var $prevOption = $select.find(':selected').prev();
+    if ($prevOption.size() > 0) {
+      $prevStatement.text($prevOption.text());
+      $prevStatement.click(function(event) {
+        event.preventDefault();
+        $select.val($prevOption.val()).change();
+      });
+    }
+  }
+
+  $(function() {
+    loadStatement();
+    loadSummary();
+    initializeSelect();
+
+    $('#statement_options').change(function() {
+      loadStatement();
+      loadSummary();
+
+      initializeSelect();
+    });
+  });
+</script>
+
+<h1>
+  <%= @statement.name %>
+</h1>
 
 <div class="row">
   <div class="col s6">
-
+    <form id="statement_options" class="row">
+      <div class="input-field col s6">
+        <%= select_tag 'month', options_for_select(@month_options, @statement.date_key), id: 'month' %>
+        <label>Month</label>
+      </div>
+      <div class="input-field col s6">
+        <%= select_tag 'sort_by', options_for_select(@sort_options), id: 'sort_by' %>
+        <label>Sort by</label>
+      </div>
+    </form>
+    <a id="prev_statement" href="#"></a>
+    <a id="next_statement" href="#" class="right"></a>
   </div>
   <div class="col s6">
     <%= render partial: 'shared/verification_status',
         locals: { verification_state: @statement.verification_state, show_unverified_spend: true } %>
   </div>
+</div>
+
+
+
+<div id="transactions">
+
 </div>
