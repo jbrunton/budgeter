@@ -28,6 +28,12 @@ class StatementsController < ApplicationController
     render 'transactions/statement', layout: false
   end
 
+  def summary
+    @statement = Statement.new(@project, Date.parse(params[:date]))
+    render partial: 'shared/verification_status',
+      locals: { verification_state: @statement.verification_state, show_unverified_spend: true }
+  end
+
   def import
 
   end

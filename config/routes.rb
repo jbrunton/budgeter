@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   get 'projects/:id/statements', to: 'statements#index', as: 'project_statements'
   get 'projects/:id/statements/:date', to: 'statements#show', as: 'project_statement'
   get 'projects/:id/statements/:date/transactions', to: 'statements#transactions', as: 'statement_transactions'
+  get 'projects/:id/statements/:date/summary', to: 'statements#summary', as: 'statement_summary'
 
 
   resources :projects do

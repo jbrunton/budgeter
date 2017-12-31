@@ -2,16 +2,19 @@
 
 <script>
   function loadStatement() {
-    var $select = $('select[name=month]');
-    var date_key = $select.val();
+    var date_key = $('select[name=month]').val();
     var query = $('#statement_options').serialize();
     $('#transactions').animate({opacity: 0});
     $('#transactions').load(`${date_key}/transactions?${query}`, null, initializeCategoryForms);
   }
 
   function loadSummary() {
+    var date_key = $('select[name=month]').val();
     var query = $('#statement_options').serialize();
-    $('#summary').load(`transactions/statement_summary?${query}`);
+    $('#summary').animate({opacity: 0});
+    $('#summary').load(`${date_key}/summary?${query}`, null, function() {
+      $('#summary').animate({opacity: 1});
+    });
   }
 
   function initializeCategoryForms() {
@@ -134,8 +137,7 @@
     </form>
   </div>
   <div class="col s6">
-    <%= render partial: 'shared/verification_status',
-        locals: { verification_state: @statement.verification_state, show_unverified_spend: true } %>
+    <div id="summary"></div>
   </div>
 </div>
 
