@@ -26,6 +26,8 @@ $secondary-color: color("pink", "base") !default;
 @import 'components/panel';
 @import 'components/button';
 
+@import 'pages/projects';
+
 textarea.yaml-preview {
   height: 30rem;
   font-family: "Source Code Pro", Monaco, monospace;
@@ -36,10 +38,6 @@ h1, h2, h3, h4, h5, h6 {
   & > b, & > strong {
     font-weight: 400;
   }
-}
-
-div.heading {
-  border-bottom: 1px solid rgba(0, 0, 0, .12);
 }
 
 table.summary {

@@ -2,7 +2,55 @@
 
 <p id="notice"><%= notice %></p>
 
-<div class="row heading">
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawCharts);
+
+  function drawCharts() {
+    var balanceChartDiv = $('#balance_chart');
+    balanceChartDiv.css('height', balanceChartDiv.width() * 0.5);
+    balanceChartDiv.animate({opacity: 0});
+
+    var spendChartDiv = $('#spend_chart');
+    spendChartDiv.css('height', spendChartDiv.width() * 0.5);
+    spendChartDiv.animate({opacity: 0});
+
+    $.get('<%= @balance_chart_url.html_safe %>', function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        legend: 'none',
+        chartArea: {
+          width: '75%',
+          height: '75%'
+        }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('balance_chart'));
+
+      chart.draw(data, options);
+      balanceChartDiv.animate({opacity: 1});
+    });
+
+    $.get('<%= @spend_chart_url.html_safe %>', function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        legend: 'none',
+        chartArea: {
+          width: '75%',
+          height: '75%'
+        },
+        isStacked: true
+      };
+
+      var chart = new google.visualization.SteppedAreaChart(document.getElementById('spend_chart'));
+
+      chart.draw(data, options);
+      spendChartDiv.animate({opacity: 1});
+    });
+  }
+</script>
+
+<div class="row">
   <div class="col s10">
     <h3><%= @project.name %></h3>
   </div>
@@ -11,72 +59,48 @@
   </div>
 </div>
 
-<div class="row">
+<div class="divider"></div>
+
+<div class="row section">
   <div class="col s6">
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawCharts);
+    <h5>
+      Accounts
+      <%= link_to 'More →', project_accounts_path(@project), class: 'btn-flat right' %>
+    </h5>
+    <div class="accounts collection">
+      <% @project.accounts.each do |account| %>
+          <a href="<%= account_path(account) %>" class="collection-item">
+            <b><%= account.name %></b>
+            <br>
+            <%= I18n.t account.account_type %>
+          </a>
+      <% end %>
+    </div>
+  </div>
+  <div class="col s6">
+  </div>
+</div>
 
-      function drawCharts() {
-        var balanceChartDiv = $('#balance_chart');
-        balanceChartDiv.css('height', balanceChartDiv.width() * 0.5);
-        balanceChartDiv.animate({opacity: 0});
+<div class="divider"></div>
 
-        var spendChartDiv = $('#spend_chart');
-        spendChartDiv.css('height', spendChartDiv.width() * 0.5);
-        spendChartDiv.animate({opacity: 0});
-
-        $.get('<%= @balance_chart_url.html_safe %>', function(jsonData) {
-          var data = new google.visualization.DataTable(jsonData);
-          var options = {
-            legend: 'none',
-            chartArea: {
-              width: '75%',
-              height: '75%'
-            }
-          };
-
-          var chart = new google.visualization.LineChart(document.getElementById('balance_chart'));
-
-          chart.draw(data, options);
-          balanceChartDiv.animate({opacity: 1});
-        });
-
-        $.get('<%= @spend_chart_url.html_safe %>', function(jsonData) {
-          var data = new google.visualization.DataTable(jsonData);
-          var options = {
-            legend: 'none',
-            chartArea: {
-              width: '75%',
-              height: '75%'
-            },
-            isStacked: true
-          };
-
-          var chart = new google.visualization.SteppedAreaChart(document.getElementById('spend_chart'));
-
-          chart.draw(data, options);
-          spendChartDiv.animate({opacity: 1});
-        });
-      }
-    </script>
-
+<div class="row section">
+  <div class="col s6">
     <h5>
       Balance History
       <%= link_to 'Details →', reports_balance_project_path(@project), class: 'btn-flat right' %>
     </h5>
     <div id="balance_chart">
     </div>
-
+  </div>
+  <div class="col s6">
     <h5>
       Spend
       <%= link_to 'Details →', reports_spend_project_path(@project), class: 'btn-flat right' %>
     </h5>
     <div id="spend_chart">
     </div>
-  </div>
-  <div class="col s6">
-    <table class="summary">
+
+    <table class="accounts summary">
       <tr>
         <th>
           Verified amounts
@@ -111,22 +135,6 @@
         </td>
       </tr>
     </table>
-
-    <hr>
-    <h5>
-      Accounts
-      <%= link_to 'More →', project_accounts_path(@project), class: 'btn-flat right' %>
-    </h5>
-    <div class="collection">
-    <% @project.accounts.each do |account| %>
-        <a href="<%= account_path(account) %>" class="collection-item">
-          <b><%= account.name %></b>
-          <br>
-          <%= I18n.t account.account_type %>
-        </a>
-    <% end %>
-    </div>
-
   </div>
 </div>
 
