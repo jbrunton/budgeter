@@ -2,7 +2,7 @@ class Account < ApplicationRecord
   belongs_to :project
   has_many :transactions
 
-  TYPES = [['current', 'current'], ['credit_card', 'credit_card']]
+  TYPES = ['current', 'credit_card']
 
   scope :current, -> { where(account_type: 'current') }
   scope :credit_card, -> { where(account_type: 'credit_card') }

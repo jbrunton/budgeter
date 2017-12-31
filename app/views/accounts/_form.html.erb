@@ -17,7 +17,7 @@
   </div>
 
   <div class="input-field">
-    <%= form.select :account_type, Account::TYPES %>
+    <%= form.select :account_type, Account::TYPES.map{ |t| [I18n.t(t), t]} %>
     <%= form.label :type %>
   </div>
 
