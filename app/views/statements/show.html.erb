@@ -80,6 +80,10 @@
     var statement_name = $select.find(':selected').text();
     $('#statement_name').text(statement_name);
 
+    var date_key = $select.val();
+    var url = `${window.location.origin}<%= project_statements_path(@project) %>/${date_key}`;
+    history.pushState(null, document.title, url);
+
     var $nextStatement = $('#next_statement');
     $nextStatement.text('');
     var $nextOption = $select.find(':selected').next();
