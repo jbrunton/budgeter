@@ -1,5 +1,11 @@
 <% breadcrumb :statement, @statement %>
 
+<% unless @prev_statement.nil? %>
+    <%= link_to "← #{@prev_statement.name}", @prev_statement.path, class: 'left' %>
+<% end %>
+<% unless @next_statement.nil? %>
+    <%= link_to "#{@next_statement.name} →", @next_statement.path, class: 'right' %>
+<% end %>
 <h1><%= @statement.name %></h1>
 
 <div class="row">

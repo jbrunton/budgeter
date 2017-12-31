@@ -7,6 +7,14 @@ class StatementsController < ApplicationController
 
   def show
     @statement = Statement.new(@project, Date.parse(params[:date]))
+    @prev_statement = @next_statement = nil
+    @project.statements.each do |statement|
+      if statement.start_date == @statement.start_date.prev_month
+        @prev_statement = statement
+      elsif statement.start_date == @statement.start_date.next_month
+        @next_statement = statement
+      end
+    end
   end
 
   def import

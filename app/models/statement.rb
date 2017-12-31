@@ -18,6 +18,10 @@ class Statement
       .within_month(@start_date)
   end
 
+  def path
+    Rails.application.routes.url_helpers.project_statement_path(@project, @start_date.strftime('%Y-%m-%d'))
+  end
+
   def self.for(project)
     transactions = project.transactions.by_date
     first_date = transactions.first.date.beginning_of_month
