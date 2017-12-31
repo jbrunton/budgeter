@@ -2,41 +2,186 @@
 
 <p id="notice"><%= notice %></p>
 
-<h3><%= @project.name %></h3>
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawCharts);
+
+  function drawCharts() {
+    var balanceChartDiv = $('#balance_chart');
+    balanceChartDiv.css('height', balanceChartDiv.width() * 0.5);
+    balanceChartDiv.animate({opacity: 0});
+
+    var spendChartDiv = $('#spend_chart');
+    spendChartDiv.css('height', spendChartDiv.width() * 0.5);
+    spendChartDiv.animate({opacity: 0});
+
+    $.get('<%= @balance_chart_url.html_safe %>', function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        legend: 'none',
+        chartArea: {
+          width: '75%',
+          height: '75%'
+        }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('balance_chart'));
+
+      chart.draw(data, options);
+      balanceChartDiv.animate({opacity: 1});
+    });
+
+    $.get('<%= @spend_chart_url.html_safe %>', function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        legend: 'none',
+        chartArea: {
+          width: '75%',
+          height: '75%'
+        },
+        isStacked: true
+      };
+
+      var chart = new google.visualization.SteppedAreaChart(document.getElementById('spend_chart'));
+
+      chart.draw(data, options);
+      spendChartDiv.animate({opacity: 1});
+    });
+  }
+</script>
 
 <div class="row">
-  <div class="col s4">
-    <ul class="collection with-header">
-      <li class="collection-header"><h4>Reports</h4></li>
-      <li class="collection-item">
-        <%= link_to 'Balance History', reports_balance_project_path(@project) %>
-      </li>
-      <li class="collection-item">
-        <%= link_to 'Spend', reports_spend_project_path(@project) %>
-      </li>
-    </ul>
+  <div class="col s10">
+    <h3><%= @project.name %></h3>
   </div>
-  <div class="col s4">
-    <ul class="collection with-header">
-      <li class="collection-header"><h4>Accounts</h4></li>
-      <li class="collection-item">
-        <%= link_to 'View Accounts', project_accounts_path(@project) %>
-      </li>
-      <li class="collection-item">
-        <%= link_to 'Backup and Restore', backup_project_path(@project) %>
-      </li>
-      <li class="collection-item">
-        <%= link_to 'Train Classifier', train_project_path(@project) %>
-      </li>
-    </ul>
-  </div>
-  <div class="col s4">
-    <p>
-      <strong>Directory:</strong>
-      <%= @project.directory %>
-    </p>
+  <div class="col s2">
+    <%= link_to 'Edit', edit_project_path(@project), class: 'btn-flat right' %>
   </div>
 </div>
 
-<%= link_to 'Edit', edit_project_path(@project) %> |
-<%= link_to 'Back', projects_path %>
+<div class="divider"></div>
+
+<div class="row section">
+  <div class="col s6">
+    <h5>
+      Accounts
+      <%= link_to 'More →', project_accounts_path(@project), class: 'btn-flat right' %>
+    </h5>
+    <div class="accounts collection">
+      <% @project.accounts.each do |account| %>
+          <a href="<%= account_path(account) %>" class="collection-item">
+            <b><%= account.name %></b>
+            <br>
+            <%= I18n.t account.account_type %>
+          </a>
+      <% end %>
+    </div>
+  </div>
+  <div class="col s6">
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="row section">
+  <div class="col s6">
+    <h5>
+      Balance History
+      <%= link_to 'Details →', reports_balance_project_path(@project), class: 'btn-flat right' %>
+    </h5>
+    <div id="balance_chart">
+    </div>
+  </div>
+  <div class="col s6">
+    <h5>
+      Spend
+      <%= link_to 'Details →', reports_spend_project_path(@project), class: 'btn-flat right' %>
+    </h5>
+    <div id="spend_chart">
+    </div>
+
+    <table class="accounts summary">
+      <tr>
+        <th>
+          Verified amounts
+        </th>
+        <td>
+          <span class="verified">
+            £<%= currency(@verification_state[:verified_spend]) %>
+          </span>
+          <span class="light">
+          (<%= @verification_state[:percent_verified_spend].round %>%)
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <th>
+          Unverified amounts
+        </th>
+        <td>
+          <span class="unverified">
+            £<%= currency(@verification_state[:unverified_spend]) %>
+          </span>
+          <span class="light">
+          (<%= @verification_state[:percent_unverified_spend].round %>%)
+          </span>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <div class="progress verification_state">
+            <div class="determinate" style="width: <%= @verification_state[:percent_verified_spend] %>%"></div>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<div class="fixed-action-btn">
+  <a class="btn-floating btn-large red">
+    <i class="large material-icons">menu</i>
+  </a>
+  <ul>
+    <li>
+      <a href="<%= new_project_account_path(@project) %>" class="btn-floating red tooltipped" data-position="left" data-tooltip="add account">
+        <i class="material-icons">add_box</i>
+      </a>
+    </li>
+    <li>
+      <a href="#import-statements-modal" class="btn-floating yellow darken-2 tooltipped modal-trigger" data-position="left" data-tooltip="import statements">
+        <i class="material-icons">file_upload</i>
+      </a>
+    </li>
+    <li>
+      <a href="<%= backup_project_path(@project) %>" class="btn-floating green tooltipped" data-position="left" data-tooltip="backup / restore">
+        <i class="material-icons">archive</i>
+      </a>
+    </li>
+    <li>
+      <a href="<%= train_project_path(@project) %>" class="btn-floating blue tooltipped" data-position="left" data-tooltip="train classifier">
+        <i class="material-icons">school</i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<!-- Modal Structure -->
+<div id="import-statements-modal" class="modal modal-fixed-footer">
+  <div class="modal-content">
+    <h4>Import Statements</h4>
+    <p>Which account do you want to import statements for?</p>
+    <div class="collection">
+    <% @project.accounts.each do |account| %>
+        <a href="<%= import_statement_account_path(account) %>" class="collection-item">
+          <b><%= account.name %></b>
+          <br>
+          <%= I18n.t account.account_type %>
+        </a>
+    <% end %>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Cancel</a>
+  </div>
+</div>

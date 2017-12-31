@@ -1,5 +1,7 @@
 class ProjectsController < ApplicationController
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :categories, :verification_state]
+
+  include FormatHelper
 
   def categories
     respond_to do |format|
@@ -16,6 +18,17 @@ class ProjectsController < ApplicationController
   # GET /projects/1
   # GET /projects/1.json
   def show
+    @verification_state = @project.verification_state
+
+    charts_to_date = @project.transactions.last.date
+    charts_from_date = (charts_to_date - 90.days).beginning_of_month
+    chart_params = 'from_date=' + date_value(charts_from_date) +
+      '&to_date=' + date_value(charts_to_date) +
+      '&show_total=true';
+    chart_account_ids = @project.accounts.map{ |a| "account_ids[]=#{a.id}" }.join('&')
+
+    @balance_chart_url = "#{project_path(@project)}/reports/balance_data/?#{chart_params}"
+    @spend_chart_url = "#{project_path(@project)}/reports/spend_data/?#{chart_params}&#{chart_account_ids}"
   end
 
   # GET /projects/new

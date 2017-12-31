@@ -5,7 +5,7 @@ class ReportsController < ApplicationController
 
   def spend
     today = Date.today
-    @default_start_date = today - 360.days
+    @default_start_date = (today - 360.days).beginning_of_month
     @default_end_date = today
   end
 
@@ -17,8 +17,8 @@ class ReportsController < ApplicationController
       .map{ |category, _| category }
       .to_a
 
-    first_date = Date.parse(params[:from_date]).beginning_of_month
-    last_date = Date.parse(params[:to_date]).beginning_of_month
+    first_date = Date.parse(params[:from_date])
+    last_date = Date.parse(params[:to_date])
     dates = DateRange.new(first_date, last_date, true).to_a
 
     builder = DataTableBuilder.new
