@@ -1,7 +1,5 @@
-.accounts.collection {
-  margin-top: 1rem;
-}
-
-.accounts.summary {
-  margin-top: 1rem;
+.accounts {
+  &.collection, &.summary {
+    margin-top: 1.5rem;
+  }
 }
