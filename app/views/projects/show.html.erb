@@ -52,7 +52,7 @@
 
 <div class="row">
   <div class="col s10">
-    <h3><%= @project.name %></h3>
+    <h1><%= @project.name %></h1>
   </div>
   <div class="col s2">
     <%= link_to 'Edit', edit_project_path(@project), class: 'btn-flat right' %>
@@ -61,13 +61,18 @@
 
 <div class="divider"></div>
 
-<div class="row section">
+<div class="row section accounts header">
   <div class="col s6">
-    <h5>
+    <h4>
       Accounts
       <%= link_to 'More →', project_accounts_path(@project), class: 'btn-flat right' %>
-    </h5>
-    <div class="accounts collection">
+    </h4>
+  </div>
+  <div class="col s6"></div>
+</div>
+<div class="row">
+  <div class="col s6">
+    <div class="collection">
       <% @project.accounts.each do |account| %>
           <a href="<%= account_path(account) %>" class="collection-item">
             <b><%= account.name %></b>
@@ -78,37 +83,20 @@
     </div>
   </div>
   <div class="col s6">
-  </div>
-</div>
-
-<div class="divider"></div>
-
-<div class="row section">
-  <div class="col s6">
-    <h5>
-      Balance History
-      <%= link_to 'Details →', reports_balance_project_path(@project), class: 'btn-flat right' %>
-    </h5>
-    <div id="balance_chart">
-    </div>
-  </div>
-  <div class="col s6">
-    <h5>
-      Spend
-      <%= link_to 'Details →', reports_spend_project_path(@project), class: 'btn-flat right' %>
-    </h5>
-    <div id="spend_chart">
-    </div>
-
     <table class="accounts summary">
       <tr>
         <th>
           Verified amounts
         </th>
-        <td>
+        <td class="right-align">
+          <span class="verified">£</span>
+        </td>
+        <td class="right-align number">
           <span class="verified">
-            £<%= currency(@verification_state[:verified_spend]) %>
+            <%= currency(@verification_state[:verified_spend]) %>
           </span>
+        </td>
+        <td class="right-align">
           <span class="light">
           (<%= @verification_state[:percent_verified_spend].round %>%)
           </span>
@@ -118,23 +106,49 @@
         <th>
           Unverified amounts
         </th>
-        <td>
+        <td class="right-align">
+          <span class="unverified">£</span>
+        </td>
+        <td class="right-align number">
           <span class="unverified">
-            £<%= currency(@verification_state[:unverified_spend]) %>
+            <%= currency(@verification_state[:unverified_spend]) %>
           </span>
+        </td>
+        <td class="right-align">
           <span class="light">
           (<%= @verification_state[:percent_unverified_spend].round %>%)
           </span>
         </td>
       </tr>
       <tr>
-        <td colspan="2">
+        <td colspan="4">
           <div class="progress verification_state">
             <div class="determinate" style="width: <%= @verification_state[:percent_verified_spend] %>%"></div>
           </div>
         </td>
       </tr>
     </table>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="row section">
+  <div class="col s6">
+    <h4>
+      Balance History
+      <%= link_to 'Details →', reports_balance_project_path(@project), class: 'btn-flat right' %>
+    </h4>
+    <div id="balance_chart">
+    </div>
+  </div>
+  <div class="col s6">
+    <h4>
+      Spend
+      <%= link_to 'Details →', reports_spend_project_path(@project), class: 'btn-flat right' %>
+    </h4>
+    <div id="spend_chart">
+    </div>
   </div>
 </div>
 
@@ -145,7 +159,7 @@
   <ul>
     <li>
       <a href="<%= new_project_account_path(@project) %>" class="btn-floating red tooltipped" data-position="left" data-tooltip="add account">
-        <i class="material-icons">add_box</i>
+        <i class="material-icons">add</i>
       </a>
     </li>
     <li>

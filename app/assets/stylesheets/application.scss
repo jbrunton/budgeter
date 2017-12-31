@@ -18,6 +18,13 @@
 $primary-color: color("deep-purple", "darken-2") !default;
 $secondary-color: color("pink", "base") !default;
 
+$h1-fontsize: 3.33rem !default;
+$h2-fontsize: 2.67rem !default;
+$h3-fontsize: 2.33rem !default;
+$h4-fontsize: 2.00rem !default;
+$h5-fontsize: 1.67rem !default;
+$h6-fontsize: 1.33rem !default;
+
 @import "materialize";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import 'transactions';
@@ -49,9 +56,12 @@ table.summary {
     font-size: 120%;
     font-weight: 300;
     font-variant: small-caps;
-    text-align: right;
+    width: 40%;
   }
   td {
+    &.number {
+      width: 1px;
+    }
     .unverified {
       @extend .pink-text, .accent-3;
     }
