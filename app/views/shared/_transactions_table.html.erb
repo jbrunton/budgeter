@@ -20,7 +20,7 @@
           <td class="numeric"><%= currency transaction.balance %></td>
           <td><%= transaction.category %></td>
           <td><%= transaction.predicted_category %></td>
-          <td><%= transaction.verified %></td>
+          <td><%= transaction.verified ? '✓' : nil %></td>
         </tr>
     <% end %>
   </tbody>
