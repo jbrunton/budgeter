@@ -1,11 +1,17 @@
 <div class="row">
   <div class="col s6">
-    <h5><%= @current_scores[:correct_transactions_score] %>% of transactions</h5>
+    <h5>
+      <%= @current_scores[:correct_transactions_score] %>% of transactions
+      (<%= @current_scores[:correct_transactions].count %>/<%= @current_scores[:verifiable_transactions].count %>)
+    </h5>
     <h5><%= @current_scores[:correct_amount_score] %>% of spend</h5>
   </div>
   <div class="col s6">
     <% if defined?(@preview_scores) %>
-        <h5><%= @preview_scores[:correct_transactions_score] %>% of transactions</h5>
+        <h5>
+          <%= @preview_scores[:correct_transactions_score] %>% of transactions
+          (<%= @preview_scores[:correct_transactions].count %>/<%= @preview_scores[:verifiable_transactions].count %>)
+        </h5>
         <h5><%= @preview_scores[:correct_amount_score] %>% of spend</h5>
     <% end %>
   </div>

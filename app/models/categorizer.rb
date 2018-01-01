@@ -2,7 +2,8 @@ class Categorizer
   attr_reader :project
   attr_reader :training_transactions
   attr_reader :test_transactions
-  attr_reader :score
+  attr_reader :all_transactions
+  attr_reader :scores
 
   def initialize(project)
     @project = project
@@ -10,30 +11,31 @@ class Categorizer
 
   def preview(seed, ignore_words)
     partition_transactions(seed)
-
-    classifier = StuffClassifier::Bayes.new('Transaction Classifier')
-    classifier.ignore_words = ignore_words.map{ |s| s.chomp }
-    @training_transactions.each do |t|
-      classifier.train(t.category, t.description)
-    end
+    create_classifier(ignore_words)
 
     @test_transactions.each do |t|
-      t.predicted_category = classifier.classify(t.description)
+      t.predicted_category = @classifier.classify(t.description)
     end
 
-    @score = Categorizer.score(@test_transactions)
+    @scores = Categorizer.score(@verifiable_transactions)
   end
 
   def apply(seed, ignore_words)
-    preview(seed, ignore_words)
-    @test_transactions.each do |t|
+    partition_transactions(seed)
+    create_classifier(ignore_words)
+
+    @project.transactions.each do |t|
+      unless t.verified
+        t.predicted_category = @classifier.classify(t.description)
+      end
       t.save
     end
   end
 
   def self.score(transactions)
-    verifiable_transactions = transactions.select{ |t| t.verified || !t.category.blank? }
-    correct_transactions = transactions.select { |t| t.assess_prediction == :correct }
+    puts "Scoring #{transactions.count} transactions"
+    verifiable_transactions = transactions.select{ |t| t.verifiable? }
+    correct_transactions = verifiable_transactions.select { |t| t.assess_prediction == :correct }
 
     verifiable_amount = verifiable_transactions.map{ |t| t.value.abs }.reduce(:+)
     correct_amount = correct_transactions.map{ |t| t.value.abs }.reduce(:+)
@@ -42,15 +44,26 @@ class Categorizer
     correct_amount_score = (correct_amount * 100 / verifiable_amount).to_f.round
 
     {
+      transactions: transactions,
+      verifiable_transactions: verifiable_transactions,
+      correct_transactions: correct_transactions,
       correct_amount_score: correct_amount_score,
       correct_transactions_score: correct_transactions_score
     }
   end
 
 private
+  def create_classifier(ignore_words)
+    @classifier = StuffClassifier::Bayes.new('Transaction Classifier')
+    @classifier.ignore_words = ignore_words.map{ |s| s.chomp }
+    @training_transactions.each do |t|
+      @classifier.train(t.category, t.description)
+    end
+  end
+
   def partition_transactions(seed)
-    categorised_transactions = @project.transactions.select{ |t| !t.category.blank? }
-    transactions_by_category = categorised_transactions.group_by{ |t| t.category }
+    @verifiable_transactions = @project.transactions.select{ |t| t.verifiable? }
+    transactions_by_category = @verifiable_transactions.group_by{ |t| t.verified_category }
     training_transactions = []
     test_transactions = []
     transactions_by_category.each do |_, ts|
@@ -61,7 +74,7 @@ private
 
     test_transactions.shuffle!(random: Random.new(seed))
 
-    target_test_size = (categorised_transactions.count * 0.3)
+    target_test_size = (@verifiable_transactions.count * 0.3)
     while test_transactions.size > target_test_size + 1
       training_transactions << test_transactions.pop
     end
