@@ -31,9 +31,9 @@ class Transaction < ApplicationRecord
   end
 
   def assess_prediction
-    if predicted_category.nil?
+    if predicted_category.blank?
       :no_prediction
-    elsif category == predicted_category
+    elsif verified || category == predicted_category
       :correct
     else
       :incorrect

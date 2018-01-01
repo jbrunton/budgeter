@@ -2,12 +2,12 @@
   <thead>
     <tr>
       <th class="date">Date</th>
-      <th class="transaction_type">Type</th>
       <th class="description">Description</th>
       <th class="value">Value</th>
       <th class="balance">Balance</th>
       <th class="category">Category</th>
       <th class="predicted_category">Prediction</th>
+      <th class="verified">Verified</th>
     </tr>
   </thead>
 
@@ -15,12 +15,12 @@
     <% transactions.each do |transaction| %>
         <tr class="<%= transaction.assess_prediction %>">
           <td><%= transaction.date %></td>
-          <td><%= transaction.transaction_type %></td>
           <td><%= transaction.description %></td>
           <td class="numeric"><%= currency transaction.value %></td>
           <td class="numeric"><%= currency transaction.balance %></td>
           <td><%= transaction.category %></td>
           <td><%= transaction.predicted_category %></td>
+          <td><%= transaction.verified %></td>
         </tr>
     <% end %>
   </tbody>

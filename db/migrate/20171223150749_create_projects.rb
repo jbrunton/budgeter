@@ -4,6 +4,7 @@ class CreateProjects < ActiveRecord::Migration[5.1]
       t.string :name
       t.string :directory
       t.string :ignore_words
+      t.integer :seed
 
       t.timestamps
     end

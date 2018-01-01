@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20171226173302) do
     t.string "name"
     t.string "directory"
     t.string "ignore_words"
+    t.integer "seed"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -32,7 +33,6 @@ ActiveRecord::Schema.define(version: 20171226173302) do
   create_table "transactions", force: :cascade do |t|
     t.date "date"
     t.integer "date_index"
-    t.string "transaction_type"
     t.string "description"
     t.decimal "value"
     t.decimal "balance"

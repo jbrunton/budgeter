@@ -13,6 +13,7 @@ class ProjectSerializer
     content = YAML.load(string)
     @project.name = content['name']
     @project.ignore_words = content['ignore_words']
+    @project.seed = content['seed']
     @project.save
 
     @project.accounts.delete_all
@@ -31,6 +32,7 @@ private
     {
       'name' => @project.name,
       'ignore_words' => @project.ignore_words,
+      'seed' => @project.seed,
       'accounts' => @project.accounts.map { |account| marshal_account(account) }
     }
   end
