@@ -3,21 +3,21 @@ class TrainingController < ApplicationController
   before_action :set_random_seed
 
   def train
-    @current_score = Categorizer.score(@project.transactions.select{ |t| t.verified || !t.category.blank? })
   end
 
   def preview
+    @current_scores = Categorizer.score(@project.transactions)
+
     if @random_seed.nil?
       @training_transactions = []
       @test_transactions = @project.transactions.select{ |t| t.verified || !t.category.blank? }
-      @score = Categorizer.score(@test_transactions)
     else
       categorizer = Categorizer.new(@project)
       categorizer.preview(@random_seed, params[:ignore_words].split(','))
 
       @test_transactions = categorizer.test_transactions
       @training_transactions = categorizer.training_transactions
-      @score = categorizer.score
+      @preview_scores = categorizer.score
     end
 
     render layout: false

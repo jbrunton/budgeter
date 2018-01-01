@@ -32,9 +32,19 @@ class Categorizer
   end
 
   def self.score(transactions)
-    correct_count = transactions.select { |t| t.assess_prediction == :correct }.count
-    incorrect_count = transactions.select { |t| t.assess_prediction == :incorrect }.count
-    (correct_count.to_f * 100 / (incorrect_count + correct_count)).round
+    verifiable_transactions = transactions.select{ |t| t.verified || !t.category.blank? }
+    correct_transactions = transactions.select { |t| t.assess_prediction == :correct }
+
+    verifiable_amount = verifiable_transactions.map{ |t| t.value.abs }.reduce(:+)
+    correct_amount = correct_transactions.map{ |t| t.value.abs }.reduce(:+)
+
+    correct_transactions_score = (correct_transactions.count.to_f * 100 / verifiable_transactions.count).round
+    correct_amount_score = (correct_amount * 100 / verifiable_amount).to_f.round
+
+    {
+      correct_amount_score: correct_amount_score,
+      correct_transactions_score: correct_transactions_score
+    }
   end
 
 private
