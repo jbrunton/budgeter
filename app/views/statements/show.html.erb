@@ -21,9 +21,9 @@
     $('#transactions').animate({opacity: 1});
 
     function updateRow($tr, response) {
-      var disableCheckbox = response.category != null;
+      var disableCheckbox = response.assigned_category != null;
       $tr.find('form.verified input[type=checkbox]').prop('disabled', disableCheckbox);
-      $tr.removeClass('verified').addClass(response.verified_status);
+      $tr.removeClass('categorized').addClass(response.categorized_status);
     }
 
     $('.transactions form.category input[type=text]').change(function() {

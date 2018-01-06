@@ -26,7 +26,7 @@ class StatementsController < ApplicationController
     end
 
     render partial: 'shared/transactions_table',
-      locals: { transactions: @transactions, editable: true, classify: Proc.new{ |t| t.verified_status } }
+      locals: { transactions: @transactions, editable: true, classify: Proc.new{ |t| t.categorized_status } }
   end
 
   def summary
