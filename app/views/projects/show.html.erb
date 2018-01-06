@@ -68,7 +68,11 @@
       <%= link_to 'More →', project_accounts_path(@project), class: 'btn-flat right' %>
     </h4>
   </div>
-  <div class="col s6"></div>
+  <div class="col s6">
+    <h4>
+      <%= link_to 'Statements →', project_statements_path(@project), class: 'btn-flat right' %>
+    </h4>
+  </div>
 </div>
 <div class="row">
   <div class="col s6">
@@ -83,51 +87,8 @@
     </div>
   </div>
   <div class="col s6">
-    <table class="accounts summary">
-      <tr>
-        <th>
-          Verified amounts
-        </th>
-        <td class="right-align">
-          <span class="verified">£</span>
-        </td>
-        <td class="right-align number">
-          <span class="verified">
-            <%= currency(@verification_state[:verified_spend]) %>
-          </span>
-        </td>
-        <td class="right-align">
-          <span class="light">
-          (<%= @verification_state[:percent_verified_spend].round %>%)
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          Unverified amounts
-        </th>
-        <td class="right-align">
-          <span class="unverified">£</span>
-        </td>
-        <td class="right-align number">
-          <span class="unverified">
-            <%= currency(@verification_state[:unverified_spend]) %>
-          </span>
-        </td>
-        <td class="right-align">
-          <span class="light">
-          (<%= @verification_state[:percent_unverified_spend].round %>%)
-          </span>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="4">
-          <div class="progress verification_state">
-            <div class="determinate" style="width: <%= @verification_state[:percent_verified_spend] %>%"></div>
-          </div>
-        </td>
-      </tr>
-    </table>
+    <%= render partial: 'shared/verification_status',
+        locals: { verification_state: @verification_state, show_unverified_spend: true } %>
   </div>
 </div>
 

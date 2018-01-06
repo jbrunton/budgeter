@@ -2,6 +2,8 @@ class Account < ApplicationRecord
   belongs_to :project
   has_many :transactions
 
+  include VerificationState
+
   TYPES = ['current', 'credit_card']
 
   scope :current, -> { where(account_type: 'current') }

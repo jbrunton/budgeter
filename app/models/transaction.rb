@@ -18,6 +18,10 @@ class Transaction < ApplicationRecord
     'balance'
   ]
 
+  def normalized_value
+    account.account_type == 'credit_card' ? -value : value
+  end
+
   def to_s
     "id: #{id}, #{date}, #{description}, #{category}"
   end

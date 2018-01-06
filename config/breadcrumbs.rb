@@ -48,6 +48,16 @@ crumb :report_spend do |project|
   parent :project, project
 end
 
+crumb :statements do |project|
+  link 'Statements', project_statements_path(project)
+  parent :project, project
+end
+
+crumb :statement do |statement|
+  link statement.name, project_statement_path(statement.project, statement.start_date.strftime('%Y-%m-%d'))
+  parent :statements, statement.project
+end
+
 # crumb :project_issues do |project|
 #   link "Issues", project_issues_path(project)
 #   parent :project, project

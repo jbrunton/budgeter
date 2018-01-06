@@ -1,0 +1,16 @@
+<% breadcrumb :statements, @project %>
+
+<h1>Statements</h1>
+
+<% @statements.each do |statement| %>
+    <h5><%= statement.name %></h5>
+    <div class="row">
+      <div class="col s6">
+        <%= link_to 'View', project_statement_path(@project, statement.start_date) %>
+      </div>
+      <div class="col s6">
+        <%= render partial: 'shared/verification_status',
+            locals: { verification_state: statement.verification_state, show_unverified_spend: false } %>
+      </div>
+    </div>
+<% end %>
