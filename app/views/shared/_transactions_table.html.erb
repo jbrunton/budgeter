@@ -34,8 +34,6 @@
                   <%= form.check_box :verified, { id: "verified_#{transaction.id}", disabled: !transaction.assigned_category.blank?, tabindex: -1 } %>
                   <label for="verified_<%= transaction.id %>"></label>
               <% end %>
-            <% else %>
-              <%= transaction.verified? ? '✓' : nil %>
             <% end %>
           </td>
         </tr>

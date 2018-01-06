@@ -25,9 +25,6 @@ class Categorizer
     create_classifier(ignore_words)
 
     @project.transactions.each do |t|
-      unless t.verified
-        t.predicted_category = @classifier.classify(t.description)
-      end
       t.save
     end
   end
