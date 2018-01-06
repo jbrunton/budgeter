@@ -31,18 +31,11 @@ class Transaction < ApplicationRecord
   end
 
   def assess_prediction
-    puts "verifying 8" if id == 8
-    puts "         verifiable?: #{verifiable?}" if id == 8
-    puts "   verified_category: #{verified_category}" if id == 8
-    puts "  predicted_category: #{predicted_category}" if id == 8
-    if !verifiable?
-      puts "  :no_prediction" if id == 8
+    if !verified?
       :no_prediction
     elsif verified_category == predicted_category
-      puts "  :correct" if id == 8
       :correct
     else
-      puts "  :incorrect" if id == 8
       :incorrect
     end
   end
@@ -56,32 +49,35 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def verified_status
-    if !category.blank? || verified
-      :verified
+  def verify(verified)
+    if verified
+      self.verified_category = self.predicted_category
     else
-      :unverified
+      self.verified_category = nil
     end
+    self.save
   end
 
-  def verifiable?
-    verified || !category.blank?
+  def verified?
+    !self.verified_category.nil?
   end
 
-  def verified_category
-    if !category.blank?
-      category
+  def categorized?
+    verified? || !self.assigned_category.nil?
+  end
+
+  def categorized_status
+    if categorized?
+      :categorized
     else
-      # we may be doing a preview, in which case the in-memory prediction
-      # doesn't have to correlate to the actually verified category
-      Transaction.find(id).predicted_category
+      :uncategorized
     end
   end
 
 private
   def clean_category
-    if category.blank?
-      self.category = nil
+    if assigned_category.blank?
+      self.assigned_category = nil
     end
   end
 end

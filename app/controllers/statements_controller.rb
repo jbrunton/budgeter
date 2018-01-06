@@ -25,7 +25,8 @@ class StatementsController < ApplicationController
       @transactions = @transactions.by_date
     end
 
-    render 'transactions', layout: false
+    render partial: 'shared/transactions_table',
+      locals: { transactions: @transactions, editable: true, classify: Proc.new{ |t| t.verified_status } }
   end
 
   def summary

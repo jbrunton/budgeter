@@ -22,6 +22,9 @@ class ProjectSerializer
       account_attrs['transactions'].each do |transaction_attrs|
         transaction_attrs['value'].tr!(',', '')
         transaction_attrs['balance'].tr!(',', '')
+        transaction_attrs['assigned_category'] = transaction_attrs['category']
+        transaction_attrs.delete('category')
+        transaction_attrs.delete('verified')
         account.transactions.create(transaction_attrs)
       end
     end
@@ -49,9 +52,9 @@ private
     attrs = transaction.data_attributes
     attrs['value'] = currency(attrs['value'])
     attrs['balance'] = currency(attrs['balance'])
-    attrs['category'] = transaction.category
+    attrs['assigned_category'] = transaction.assigned_category
     attrs['predicted_category'] = transaction.predicted_category
-    attrs['verified'] = transaction.verified
+    attrs['verified_category'] = transaction.verified_category
     attrs
   end
 end

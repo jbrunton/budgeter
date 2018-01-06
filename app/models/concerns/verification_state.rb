@@ -1,6 +1,6 @@
 module VerificationState
   def verification_state
-    verified_transactions = transactions.select{ |t| !t.category.blank? || t.verified }
+    verified_transactions = transactions.select{ |t| t.categorized? }
     verified_spend = verified_transactions.map{ |t| t.value.abs }.reduce(0, :+)
     total_spend = transactions.map{ |t| t.value.abs }.reduce(0, :+)
     unverified_spend = total_spend - verified_spend

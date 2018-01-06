@@ -1,5 +1,5 @@
 class TransactionsController < ApplicationController
-  before_action :set_transaction, only: [:show, :edit, :update, :destroy]
+  before_action :set_transaction, only: [:show, :edit, :update, :destroy, :verify]
   before_action :set_account
 
   # GET /transactions
@@ -78,6 +78,18 @@ class TransactionsController < ApplicationController
     end
   end
 
+  def verify
+    respond_to do |format|
+      if @transaction.verify(verified)
+        format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
+        format.json { render 'transactions/show.json.jbuilder' }
+      else
+        format.html { render :edit }
+        format.json { render json: @transaction.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
   # DELETE /transactions/1
   # DELETE /transactions/1.json
   def destroy
@@ -119,6 +131,10 @@ class TransactionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def transaction_params
-      params.require(:transaction).permit(:date, :type, :description, :value, :balance, :category, :verified)
+      params.require(:transaction).permit(:category)
+    end
+
+    def verified
+      ActiveRecord::Type::Boolean.new.deserialize(params.require(:transaction).permit(:verified)[:verified])
     end
 end

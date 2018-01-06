@@ -13,14 +13,31 @@
 
   <tbody>
     <% transactions.each do |transaction| %>
-        <tr class="<%= transaction.assess_prediction %>">
+        <tr class="<%= classify.call(transaction) %>">
           <td><%= transaction.date %></td>
           <td><%= transaction.description %></td>
           <td class="numeric"><%= currency transaction.value %></td>
           <td class="numeric"><%= currency transaction.balance %></td>
-          <td><%= transaction.category %></td>
+          <td>
+            <% if editable %>
+                <%= form_with(model: transaction, class: 'category') do |form| %>
+                    <%= form.text_field :category, { autocomplete: 'off' } %>
+                <% end %>
+            <% else %>
+              <%= transaction.category %>
+            <% end %>
+          </td>
           <td><%= transaction.predicted_category %></td>
-          <td><%= transaction.verified ? '✓' : nil %></td>
+          <td>
+            <% if editable %>
+              <%= form_with(scope: :transaction, url: verify_transaction_path(transaction), class: 'verified') do |form| %>
+                  <%= form.check_box :verified, { id: "verified_#{transaction.id}", disabled: !transaction.category.blank?, tabindex: -1 } %>
+                  <label for="verified_<%= transaction.id %>"></label>
+              <% end %>
+            <% else %>
+              <%= transaction.verified ? '✓' : nil %>
+            <% end %>
+          </td>
         </tr>
     <% end %>
   </tbody>
