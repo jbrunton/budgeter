@@ -15,10 +15,10 @@ table.transactions {
   }
 
   tr {
-    &.highlight, &.verified.highlight {
+    &.highlight, &.categorized.highlight {
       @extend .pink, .lighten-5;
     }
-    &.correct, &.verified {
+    &.correct, &.categorized {
       @extend .green, .lighten-5;
     }
     &.incorrect {

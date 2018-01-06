@@ -30,10 +30,14 @@ class Transaction < ApplicationRecord
     attributes.slice(*DATA_ATTRIBUTES)
   end
 
+  def category
+    assigned_category || verified_category
+  end
+
   def assess_prediction
-    if predicted_category.nil?
+    if !categorized?
       :no_prediction
-    elsif category == predicted_category
+    elsif assigned_category == predicted_category
       :correct
     else
       :incorrect
@@ -49,18 +53,31 @@ class Transaction < ApplicationRecord
     end
   end
 
-  def verified_status
-    if !category.blank? || verified
-      :verified
+  def verify(verified)
+    if verified
+      self.assigned_category = self.predicted_category
     else
-      :unverified
+      self.assigned_category = nil
+    end
+    self.save
+  end
+
+  def categorized?
+    !assigned_category.nil?
+  end
+
+  def categorized_status
+    if categorized?
+      :categorized
+    else
+      :uncategorized
     end
   end
 
 private
   def clean_category
-    if category.blank?
-      self.category = nil
+    if assigned_category.blank?
+      self.assigned_category = nil
     end
   end
 end

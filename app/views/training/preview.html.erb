@@ -1,9 +1,26 @@
-<% if defined? @score %>
-    <h4>Score: <%= @score %>%</h4>
-<% end %>
+<div class="row">
+  <div class="col s6">
+    <h5>
+      <%= @current_scores[:correct_transactions_score] %>% of transactions
+      (<%= @current_scores[:correct_transactions].count %>/<%= @current_scores[:verifiable_transactions].count %>)
+    </h5>
+    <h5><%= @current_scores[:correct_amount_score] %>% of spend</h5>
+  </div>
+  <div class="col s6">
+    <% if defined?(@preview_scores) %>
+        <h5>
+          <%= @preview_scores[:correct_transactions_score] %>% of transactions
+          (<%= @preview_scores[:correct_transactions].count %>/<%= @preview_scores[:verifiable_transactions].count %>)
+        </h5>
+        <h5><%= @preview_scores[:correct_amount_score] %>% of spend</h5>
+    <% end %>
+  </div>
+</div>
 <h4>Test Transactions (<%= @test_transactions.count %>)</h4>
-<%= render partial: 'shared/transactions_table', locals: { transactions: @test_transactions } %>
+<%= render partial: 'shared/transactions_table',
+    locals: { editable: false, transactions: @test_transactions, classify: lambda{ |t| t.assess_prediction } } %>
 
 <h4>Training Transactions (<%= @training_transactions.count %>)</h4>
-<%= render partial: 'shared/transactions_table', locals: { transactions: @training_transactions } %>
+<%= render partial: 'shared/transactions_table',
+    locals: { editable: false, transactions: @training_transactions, classify: lambda{ |t| t.assess_prediction } } %>
 

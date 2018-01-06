@@ -11,7 +11,7 @@ class ReportsController < ApplicationController
 
   def spend_data
     categories = Transaction.where(account: @project.accounts)
-      .group('coalesce(category, predicted_category)')
+      .group('coalesce(assigned_category, predicted_category)')
       .sum(:value)
       .sort_by { |_, v| v.abs }
       .map{ |category, _| category }
@@ -28,7 +28,7 @@ class ReportsController < ApplicationController
         month_spend = @project.transactions
           .within_month(date)
           .joins(:account)
-          .where('coalesce(category, predicted_category) = ?', category)
+          .where('coalesce(assigned_category, predicted_category) = ?', category)
           .where('account_id in (?)', params[:account_ids])
           .sum("case accounts.account_type when 'credit_card' then -value else value end")
         month_spend < 0 ? -month_spend.to_f : 0

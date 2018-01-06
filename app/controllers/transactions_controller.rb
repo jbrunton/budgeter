@@ -1,5 +1,5 @@
 class TransactionsController < ApplicationController
-  before_action :set_transaction, only: [:show, :edit, :update, :destroy]
+  before_action :set_transaction, only: [:show, :edit, :update, :destroy, :verify]
   before_action :set_account
 
   # GET /transactions
@@ -67,15 +67,11 @@ class TransactionsController < ApplicationController
   # PATCH/PUT /transactions/1
   # PATCH/PUT /transactions/1.json
   def update
-    respond_to do |format|
-      if @transaction.update(transaction_params)
-        format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
-        format.json { render 'transactions/show.json.jbuilder' }
-      else
-        format.html { render :edit }
-        format.json { render json: @transaction.errors, status: :unprocessable_entity }
-      end
-    end
+    update_transaction { @transaction.update(transaction_params) }
+  end
+
+  def verify
+    update_transaction { @transaction.verify(verified) }
   end
 
   # DELETE /transactions/1
@@ -119,6 +115,22 @@ class TransactionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def transaction_params
-      params.require(:transaction).permit(:date, :type, :description, :value, :balance, :category, :verified)
+      params.require(:transaction).permit(:assigned_category)
+    end
+
+    def verified
+      ActiveRecord::Type::Boolean.new.deserialize(params.require(:transaction).permit(:verified)[:verified])
+    end
+
+    def update_transaction
+      respond_to do |format|
+        if yield()
+          format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
+          format.json { render 'transactions/show.json.jbuilder' }
+        else
+          format.html { render :edit }
+          format.json { render json: @transaction.errors, status: :unprocessable_entity }
+        end
+      end
     end
 end

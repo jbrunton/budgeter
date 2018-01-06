@@ -31,6 +31,9 @@ Rails.application.routes.draw do
           get 'statement'
           get 'statement_summary'
         end
+        member do
+          post 'verify'
+        end
       end
       member do
         get 'import_statement'

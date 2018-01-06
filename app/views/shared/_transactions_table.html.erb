@@ -2,25 +2,40 @@
   <thead>
     <tr>
       <th class="date">Date</th>
-      <th class="transaction_type">Type</th>
       <th class="description">Description</th>
       <th class="value">Value</th>
       <th class="balance">Balance</th>
       <th class="category">Category</th>
       <th class="predicted_category">Prediction</th>
+      <th class="verified">Verify</th>
     </tr>
   </thead>
 
   <tbody>
     <% transactions.each do |transaction| %>
-        <tr class="<%= transaction.assess_prediction %>">
+        <tr class="<%= classify.call(transaction) %>">
           <td><%= transaction.date %></td>
-          <td><%= transaction.transaction_type %></td>
           <td><%= transaction.description %></td>
           <td class="numeric"><%= currency transaction.value %></td>
           <td class="numeric"><%= currency transaction.balance %></td>
-          <td><%= transaction.category %></td>
+          <td>
+            <% if editable %>
+                <%= form_with(model: transaction, class: 'category') do |form| %>
+                    <%= form.text_field :assigned_category, { autocomplete: 'off' } %>
+                <% end %>
+            <% else %>
+              <%= transaction.assigned_category %>
+            <% end %>
+          </td>
           <td><%= transaction.predicted_category %></td>
+          <td>
+            <% if editable %>
+              <%= form_with(scope: :transaction, url: verify_transaction_path(transaction), class: 'verified') do |form| %>
+                  <%= form.check_box :verified, { id: "verified_#{transaction.id}", disabled: !transaction.assigned_category.blank?, tabindex: -1 } %>
+                  <label for="verified_<%= transaction.id %>"></label>
+              <% end %>
+            <% end %>
+          </td>
         </tr>
     <% end %>
   </tbody>

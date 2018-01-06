@@ -13,6 +13,7 @@ class ProjectSerializer
     content = YAML.load(string)
     @project.name = content['name']
     @project.ignore_words = content['ignore_words']
+    @project.seed = content['seed']
     @project.save
 
     @project.accounts.delete_all
@@ -21,6 +22,10 @@ class ProjectSerializer
       account_attrs['transactions'].each do |transaction_attrs|
         transaction_attrs['value'].tr!(',', '')
         transaction_attrs['balance'].tr!(',', '')
+        if transaction_attrs['assigned_category'].nil? && !transaction_attrs['verified_category'].nil?
+          transaction_attrs['assigned_category'] = transaction_attrs['verified_category']
+        end
+        transaction_attrs.delete('verified_category')
         account.transactions.create(transaction_attrs)
       end
     end
@@ -31,6 +36,7 @@ private
     {
       'name' => @project.name,
       'ignore_words' => @project.ignore_words,
+      'seed' => @project.seed,
       'accounts' => @project.accounts.map { |account| marshal_account(account) }
     }
   end
@@ -47,9 +53,8 @@ private
     attrs = transaction.data_attributes
     attrs['value'] = currency(attrs['value'])
     attrs['balance'] = currency(attrs['balance'])
-    attrs['category'] = transaction.category
+    attrs['assigned_category'] = transaction.assigned_category
     attrs['predicted_category'] = transaction.predicted_category
-    attrs['verified'] = transaction.verified
     attrs
   end
 end

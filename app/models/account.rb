@@ -10,7 +10,7 @@ class Account < ApplicationRecord
   scope :credit_card, -> { where(account_type: 'credit_card') }
 
   def categories
-    transactions.distinct.pluck(:category).compact
+    transactions.distinct.pluck(:assigned_category).compact
   end
 
   def balance_on(date)
