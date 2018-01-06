@@ -67,27 +67,11 @@ class TransactionsController < ApplicationController
   # PATCH/PUT /transactions/1
   # PATCH/PUT /transactions/1.json
   def update
-    respond_to do |format|
-      if @transaction.update(transaction_params)
-        format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
-        format.json { render 'transactions/show.json.jbuilder' }
-      else
-        format.html { render :edit }
-        format.json { render json: @transaction.errors, status: :unprocessable_entity }
-      end
-    end
+    update_transaction { @transaction.update(transaction_params) }
   end
 
   def verify
-    respond_to do |format|
-      if @transaction.verify(verified)
-        format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
-        format.json { render 'transactions/show.json.jbuilder' }
-      else
-        format.html { render :edit }
-        format.json { render json: @transaction.errors, status: :unprocessable_entity }
-      end
-    end
+    update_transaction { @transaction.verify(verified) }
   end
 
   # DELETE /transactions/1
@@ -136,5 +120,17 @@ class TransactionsController < ApplicationController
 
     def verified
       ActiveRecord::Type::Boolean.new.deserialize(params.require(:transaction).permit(:verified)[:verified])
+    end
+
+    def update_transaction
+      respond_to do |format|
+        if yield()
+          format.html { redirect_to @transaction, notice: 'Transaction was successfully updated.' }
+          format.json { render 'transactions/show.json.jbuilder' }
+        else
+          format.html { render :edit }
+          format.json { render json: @transaction.errors, status: :unprocessable_entity }
+        end
+      end
     end
 end
