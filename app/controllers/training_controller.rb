@@ -10,7 +10,7 @@ class TrainingController < ApplicationController
 
     if @random_seed.nil?
       @training_transactions = []
-      @test_transactions = @project.transactions.select{ |t| t.verifiable? }
+      @test_transactions = @project.transactions.select{ |t| t.categorized? }
     else
       categorizer = Categorizer.new(@project)
       categorizer.preview(@random_seed, params[:ignore_words].split(','))
@@ -21,10 +21,10 @@ class TrainingController < ApplicationController
 
       @in_current_not_preview = @current_scores[:correct_transactions].select{ |t| !@preview_scores[:correct_transactions].collect(&:id).include?(t.id) }
       @in_preview_not_current = @preview_scores[:correct_transactions].select{ |t| !@current_scores[:correct_transactions].collect(&:id).include?(t.id) }
-      puts "in current not preview:"
-      puts @in_current_not_preview.map{|t| t.slice(:id, :description, :category, :predicted_category, :verified_category, :assess_prediction)}.to_yaml
-      puts "in preview not current:"
-      puts @in_preview_not_current.map{|t| t.slice(:id, :description, :category, :predicted_category, :verified_category, :assess_prediction)}.to_yaml
+      # puts "in current not preview:"
+      # puts @in_current_not_preview.map{|t| t.slice(:id, :description, :category, :predicted_category, :verified_category, :assess_prediction)}.to_yaml
+      # puts "in preview not current:"
+      # puts @in_preview_not_current.map{|t| t.slice(:id, :description, :category, :predicted_category, :verified_category, :assess_prediction)}.to_yaml
     end
 
 

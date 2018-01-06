@@ -34,7 +34,7 @@ class Categorizer
 
   def self.score(transactions)
     puts "Scoring #{transactions.count} transactions"
-    verifiable_transactions = transactions.select{ |t| t.verifiable? }
+    verifiable_transactions = transactions.select{ |t| t.categorized? }
     correct_transactions = verifiable_transactions.select { |t| t.assess_prediction == :correct }
 
     verifiable_amount = verifiable_transactions.map{ |t| t.value.abs }.reduce(:+)
@@ -62,8 +62,8 @@ private
   end
 
   def partition_transactions(seed)
-    @verifiable_transactions = @project.transactions.select{ |t| t.verifiable? }
-    transactions_by_category = @verifiable_transactions.group_by{ |t| t.verified_category }
+    @verifiable_transactions = @project.transactions.select{ |t| t.categorized? }
+    transactions_by_category = @verifiable_transactions.group_by{ |t| t.category }
     training_transactions = []
     test_transactions = []
     transactions_by_category.each do |_, ts|

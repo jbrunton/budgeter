@@ -17,8 +17,10 @@
   </div>
 </div>
 <h4>Test Transactions (<%= @test_transactions.count %>)</h4>
-<%= render partial: 'shared/transactions_table', locals: { transactions: @test_transactions } %>
+<%= render partial: 'shared/transactions_table',
+    locals: { editable: false, transactions: @test_transactions, classify: lambda{ |t| t.assess_prediction } } %>
 
 <h4>Training Transactions (<%= @training_transactions.count %>)</h4>
-<%= render partial: 'shared/transactions_table', locals: { transactions: @training_transactions } %>
+<%= render partial: 'shared/transactions_table',
+    locals: { editable: false, transactions: @test_transactions, classify: lambda{ |t| t.assess_prediction } } %>
 

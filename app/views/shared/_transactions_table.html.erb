@@ -35,7 +35,7 @@
                   <label for="verified_<%= transaction.id %>"></label>
               <% end %>
             <% else %>
-              <%= transaction.verified ? '✓' : nil %>
+              <%= transaction.verified? ? '✓' : nil %>
             <% end %>
           </td>
         </tr>
