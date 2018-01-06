@@ -37,9 +37,7 @@ class Transaction < ApplicationRecord
   def assess_prediction
     if !categorized?
       :no_prediction
-    elsif !verified_category.nil? && verified_category == predicted_category
-      :correct
-    elsif !assigned_category.nil? && assigned_category == predicted_category
+    elsif assigned_category == predicted_category
       :correct
     else
       :incorrect
@@ -57,19 +55,15 @@ class Transaction < ApplicationRecord
 
   def verify(verified)
     if verified
-      self.verified_category = self.predicted_category
+      self.assigned_category = self.predicted_category
     else
-      self.verified_category = nil
+      self.assigned_category = nil
     end
     self.save
   end
 
-  def verified?
-    !self.verified_category.nil?
-  end
-
   def categorized?
-    verified? || !assigned_category.nil?
+    !assigned_category.nil?
   end
 
   def categorized_status

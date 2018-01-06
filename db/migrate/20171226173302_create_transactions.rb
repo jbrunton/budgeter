@@ -9,7 +9,6 @@ class CreateTransactions < ActiveRecord::Migration[5.1]
 
       t.string :assigned_category
       t.string :predicted_category
-      t.string :verified_category
 
       t.references :account, foreign_key: {on_delete: :cascade}
 
