@@ -22,5 +22,5 @@
 
 <h4>Training Transactions (<%= @training_transactions.count %>)</h4>
 <%= render partial: 'shared/transactions_table',
-    locals: { editable: false, transactions: @test_transactions, classify: lambda{ |t| t.assess_prediction } } %>
+    locals: { editable: false, transactions: @training_transactions, classify: lambda{ |t| t.assess_prediction } } %>
 
