@@ -24,7 +24,7 @@
     <h4>Current</h4>
     <div class="field-input">
       <%= label_tag(:random_seed, 'Random seed') %>
-      <%= text_field_tag(:random_seed, @project.seed, { disabled: 'disabled' }) %>
+      <%= text_field_tag(:project_seed, @project.seed, { disabled: 'disabled' }) %>
     </div>
     <div class="field-input">
       <%= label_tag(:ignore_words, 'Ignore words') %>
