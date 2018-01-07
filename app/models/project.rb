@@ -2,8 +2,6 @@ class Project < ApplicationRecord
   has_many :accounts
   has_many :transactions, through: :accounts
 
-  include VerificationState
-
   def statements
     Statement.for(self)
   end
@@ -31,5 +29,9 @@ class Project < ApplicationRecord
 
   def categories
     accounts.map{ |account| account.categories }.flatten.uniq
+  end
+
+  def verification_state
+    VerificationState.new(transactions).compute_state
   end
 end

@@ -2,8 +2,6 @@ class Statement
   attr_reader :project
   attr_reader :start_date
 
-  include VerificationState
-
   def initialize(project, start_date)
     @project = project
     @start_date = start_date
@@ -36,5 +34,9 @@ class Statement
     dates.map do |date|
       Statement.new(project, date)
     end
+  end
+
+  def verification_state
+    VerificationState.new(transactions).compute_state
   end
 end

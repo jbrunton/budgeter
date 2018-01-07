@@ -28,11 +28,10 @@ class TransactionsController < ApplicationController
   def statement_summary
     @transactions = @account.transactions.within_month(Date.parse(params[:month]))
 
-    verified_transactions = @transactions.select{ |t| !t.categorized? }
-    @verified_count = verified_transactions.size.to_f / @transactions.size
-    @verified_spend = verified_transactions.map{ |t| t.value.abs }.reduce(0, :+) / @transactions.map{ |t| t.value.abs }.reduce(0, :+)
+    verification_state = VerificationState.new(@transactions).compute_state
 
-    render layout: false
+    render partial: 'shared/verification_status',
+      locals: { verification_state: verification_state, show_unverified_spend: true }
   end
 
   # GET /transactions/1
