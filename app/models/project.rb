@@ -34,4 +34,13 @@ class Project < ApplicationRecord
   def verification_state
     VerificationState.new(transactions).compute_state
   end
+
+  def sum_category(category, month_start, account_ids)
+    transactions
+      .within_month(month_start)
+      .joins(:account)
+      .where('coalesce(assigned_category, predicted_category) = ?', category)
+      .where('account_id in (?)', account_ids)
+      .sum("case accounts.account_type when 'credit_card' then -value else value end")
+  end
 end

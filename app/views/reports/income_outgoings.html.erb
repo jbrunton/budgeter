@@ -1,0 +1,96 @@
+<% breadcrumb :report_income_outgoings, @project %>
+
+<h3>Income and Outgoings</h3>
+
+<script type="text/javascript">
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+    var div = $('#chart_div');
+    div.css('height', div.width() * 0.5);
+
+    var url = 'income_outgoings_data?' + $('#report_options').serialize();
+    $('#chart_div').animate({opacity: 0});
+    $.get(url, function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        legend: {
+          position: 'top'
+        },
+        chartArea: {
+          width: '85%',
+          height: '75%'
+        },
+        seriesType: 'bars',
+        series: {2: {type: 'line'}}
+      };
+
+      var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+
+      chart.draw(data, options);
+      $('#chart_div').animate({opacity: 1});
+    });
+  }
+
+  $(function() {
+    var $from_date = $('#from_date'),
+        $to_date = $('#to_date');
+
+    $('#from_date').pickadate({
+      format: 'yyyy-mm-dd',
+      onStart: function() {
+        this.set('select', [
+          <%= @default_start_date.year %>,
+          <%= @default_start_date.month - 1 %>,
+          <%= @default_start_date.day %>
+        ]);
+      }
+    });
+
+    $('#to_date').pickadate({
+      format: 'yyyy-mm-dd',
+      onStart: function() {
+        this.set('select', [
+          <%= @default_end_date.year %>,
+          <%= @default_end_date.month - 1 %>,
+          <%= @default_end_date.day %>
+        ]);
+      }
+    });
+  });
+
+</script>
+
+<form id="report_options">
+  <div class="row">
+    <div class="col s3">
+      <label for="from_date">From Date</label>
+      <input id="from_date" name="from_date" type="text" class="datepicker" value="<%= @default_start_date.strftime('%Y-%m-%d') %>">
+    </div>
+    <div class="col s3">
+      <label for="to_date">To Date</label>
+      <input id="to_date" name="to_date" type="text" class="datepicker" value="<%= @default_end_date.strftime('%Y-%m-%d') %>">
+    </div>
+    <div class="col s6">
+      <% @project.accounts.each do |account| %>
+          <div>
+            <input id="account_id_<%= account.id %>" type="checkbox" name="account_ids[]" value="<%= account.id %>" checked="checked">
+            <label for="account_id_<%= account.id %>"><%= account.name %></label>
+          </div>
+      <% end %>
+      <div>
+        <input id="show_total" type="checkbox" name="show_total" checked="checked">
+        <label for="show_total">Total</label>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="row">
+  <div class="col s12">
+    <a onclick="drawChart();" class="btn">Apply</a>
+  </div>
+</div>
+
+<div id="chart_div"></div>
