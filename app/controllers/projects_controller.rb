@@ -29,6 +29,7 @@ class ProjectsController < ApplicationController
 
     @balance_chart_url = "#{project_path(@project)}/reports/balance_data/?#{chart_params}"
     @spend_chart_url = "#{project_path(@project)}/reports/spend_data/?#{chart_params}&#{chart_account_ids}"
+    @income_outgoings_chart_url = "#{project_path(@project)}/reports/income_outgoings_data/?#{chart_params}&#{chart_account_ids}"
   end
 
   # GET /projects/new

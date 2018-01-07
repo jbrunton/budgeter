@@ -15,6 +15,10 @@
     spendChartDiv.css('height', spendChartDiv.width() * 0.5);
     spendChartDiv.animate({opacity: 0});
 
+    var incomeOutgoingsChartDiv = $('#income_outgoings_chart');
+    incomeOutgoingsChartDiv.css('height', spendChartDiv.width() * 0.5);
+    incomeOutgoingsChartDiv.animate({opacity: 0});
+
     $.get('<%= @balance_chart_url.html_safe %>', function(jsonData) {
       var data = new google.visualization.DataTable(jsonData);
       var options = {
@@ -46,6 +50,24 @@
 
       chart.draw(data, options);
       spendChartDiv.animate({opacity: 1});
+    });
+
+    $.get('<%= @income_outgoings_chart_url.html_safe %>', function(jsonData) {
+      var data = new google.visualization.DataTable(jsonData);
+      var options = {
+        legend: 'none',
+        chartArea: {
+          width: '75%',
+          height: '75%'
+        },
+        seriesType: 'bars',
+        series: {2: {type: 'line'}}
+      };
+
+      var chart = new google.visualization.ComboChart(document.getElementById('income_outgoings_chart'));
+
+      chart.draw(data, options);
+      incomeOutgoingsChartDiv.animate({opacity: 1});
     });
   }
 </script>
@@ -97,19 +119,34 @@
 <div class="row section">
   <div class="col s6">
     <h4>
-      Balance History
       <%= link_to 'Details →', reports_balance_project_path(@project), class: 'btn-flat right' %>
+      Balance History
     </h4>
     <div id="balance_chart">
     </div>
   </div>
   <div class="col s6">
     <h4>
-      Spend
       <%= link_to 'Details →', reports_spend_project_path(@project), class: 'btn-flat right' %>
+      Spend
     </h4>
     <div id="spend_chart">
     </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="row section">
+  <div class="col s6">
+    <h4>
+      <%= link_to 'Details →', reports_income_outgoings_project_path(@project), class: 'btn-flat right' %>
+      Income vs Outgoings
+    </h4>
+    <div id="income_outgoings_chart">
+    </div>
+  </div>
+  <div class="col s6">
   </div>
 </div>
 
