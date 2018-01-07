@@ -48,6 +48,11 @@ crumb :report_spend do |project|
   parent :project, project
 end
 
+crumb :report_income_outgoings do |project|
+  link 'Income and Outgoings Report', reports_income_outgoings_project_path(project)
+  parent :project, project
+end
+
 crumb :statements do |project|
   link 'Statements', project_statements_path(project)
   parent :project, project

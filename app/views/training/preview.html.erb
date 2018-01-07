@@ -5,6 +5,21 @@
       (<%= @current_scores[:correct_transactions].count %>/<%= @current_scores[:verifiable_transactions].count %>)
     </h5>
     <h5><%= @current_scores[:correct_amount_score] %>% of spend</h5>
+    <table>
+      <% @current_scores[:category_scores].each do |category, result| %>
+        <tr>
+          <td>
+            <%= category %>
+          </td>
+          <td>
+            <%= result[:transactions].count %>
+          </td>
+          <td>
+            <%= result[:correct_transactions_score] %>% of transactions
+          </td>
+        </tr>
+      <% end %>
+    </table>
   </div>
   <div class="col s6">
     <% if defined?(@preview_scores) %>

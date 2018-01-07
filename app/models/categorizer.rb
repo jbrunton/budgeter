@@ -31,23 +31,16 @@ class Categorizer
   end
 
   def self.score(transactions)
-    puts "Scoring #{transactions.count} transactions"
-    verifiable_transactions = transactions.select{ |t| t.categorized? }
-    correct_transactions = verifiable_transactions.select { |t| t.assess_prediction == :correct }
+    result = score_transactions(transactions)
 
-    verifiable_amount = verifiable_transactions.map{ |t| t.value.abs }.reduce(:+)
-    correct_amount = correct_transactions.map{ |t| t.value.abs }.reduce(:+)
+    transactions_by_category = result[:verifiable_transactions].group_by{ |t| t.assigned_category }
+    category_scores = transactions_by_category
+      .to_a
+      .sort_by{ |cat, ts | ts.count }
+      .map{ |category, transactions_for_category| [category, score_transactions(transactions_for_category)] }
 
-    correct_transactions_score = (correct_transactions.count.to_f * 100 / verifiable_transactions.count).round
-    correct_amount_score = (correct_amount * 100 / verifiable_amount).to_f.round
-
-    {
-      transactions: transactions,
-      verifiable_transactions: verifiable_transactions,
-      correct_transactions: correct_transactions,
-      correct_amount_score: correct_amount_score,
-      correct_transactions_score: correct_transactions_score
-    }
+    result[:category_scores] = category_scores
+    result
   end
 
 private
@@ -79,5 +72,24 @@ private
 
     @test_transactions = test_transactions
     @training_transactions = training_transactions
+  end
+
+  def self.score_transactions(transactions)
+    verifiable_transactions = transactions.select{ |t| t.categorized? }
+    correct_transactions = verifiable_transactions.select { |t| t.assess_prediction == :correct }
+
+    verifiable_amount = verifiable_transactions.map{ |t| t.value.abs }.reduce(:+)
+    correct_amount = correct_transactions.map{ |t| t.value.abs }.reduce(:+)
+
+    correct_transactions_score = (correct_transactions.count.to_f * 100 / verifiable_transactions.count).round
+    correct_amount_score = (correct_amount * 100 / verifiable_amount).to_f.round
+
+    {
+      transactions: transactions,
+      verifiable_transactions: verifiable_transactions,
+      correct_transactions: correct_transactions,
+      correct_amount_score: correct_amount_score,
+      correct_transactions_score: correct_transactions_score
+    }
   end
 end

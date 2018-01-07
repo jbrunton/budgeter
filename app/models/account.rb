@@ -17,4 +17,12 @@ class Account < ApplicationRecord
     last_transaction = transactions.where('date <= ?', date).last
     last_transaction.try(:balance)
   end
+
+  def income_between(from_date, to_date)
+    if account_type == 'current'
+      transactions.where('? <= date AND date < ? AND value > 0', from_date, to_date).sum(:value)
+    else
+      transactions.where('? <= date AND date < ? AND value < 0', from_date, to_date).sum(:value)
+    end
+  end
 end
