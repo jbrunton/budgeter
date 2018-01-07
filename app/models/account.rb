@@ -2,8 +2,6 @@ class Account < ApplicationRecord
   belongs_to :project
   has_many :transactions
 
-  include VerificationState
-
   TYPES = ['current', 'credit_card']
 
   scope :current, -> { where(account_type: 'current') }
@@ -24,5 +22,9 @@ class Account < ApplicationRecord
     else
       transactions.where('? <= date AND date < ? AND value < 0', from_date, to_date).sum(:value)
     end
+  end
+
+  def verification_state
+    VerificationState.new(transactions).compute_state
   end
 end
