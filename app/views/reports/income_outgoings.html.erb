@@ -21,10 +21,12 @@
         chartArea: {
           width: '85%',
           height: '75%'
-        }
+        },
+        seriesType: 'bars',
+        series: {2: {type: 'line'}}
       };
 
-      var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+      var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
 
       chart.draw(data, options);
       $('#chart_div').animate({opacity: 1});
