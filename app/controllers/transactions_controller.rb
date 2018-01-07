@@ -21,13 +21,14 @@ class TransactionsController < ApplicationController
       @transactions = @transactions.by_date
     end
 
-    render layout: false
+    render partial: 'shared/transactions_table',
+      locals: { transactions: @transactions, editable: true, classify: Proc.new{ |t| t.categorized_status } }
   end
 
   def statement_summary
     @transactions = @account.transactions.within_month(Date.parse(params[:month]))
 
-    verified_transactions = @transactions.select{ |t| !t.category.blank? || t.verified }
+    verified_transactions = @transactions.select{ |t| !t.categorized? }
     @verified_count = verified_transactions.size.to_f / @transactions.size
     @verified_spend = verified_transactions.map{ |t| t.value.abs }.reduce(0, :+) / @transactions.map{ |t| t.value.abs }.reduce(0, :+)
 
