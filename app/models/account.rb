@@ -2,8 +2,6 @@ class Account < ApplicationRecord
   belongs_to :project
   has_many :transactions
 
-  include VerificationState
-
   TYPES = ['current', 'credit_card']
 
   scope :current, -> { where(account_type: 'current') }
@@ -16,5 +14,9 @@ class Account < ApplicationRecord
   def balance_on(date)
     last_transaction = transactions.where('date <= ?', date).last
     last_transaction.try(:balance)
+  end
+
+  def verification_state
+    VerificationState.new(transactions).compute_state
   end
 end
