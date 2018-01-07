@@ -25,12 +25,7 @@ class ReportsController < ApplicationController
     builder.column({ type: 'date', label: 'Date' }, dates.map{ |d| serialize_date(d) })
     categories.each do |category|
       category_spend_data = dates.map do |date|
-        month_spend = @project.transactions
-          .within_month(date)
-          .joins(:account)
-          .where('coalesce(assigned_category, predicted_category) = ?', category)
-          .where('account_id in (?)', params[:account_ids])
-          .sum("case accounts.account_type when 'credit_card' then -value else value end")
+        month_spend = @project.sum_category(category, date, params[:account_ids])
         month_spend < 0 ? -month_spend.to_f : 0
       end
       builder.number({ label: category }, category_spend_data) if category_spend_data.any?{ |value| value > 0 }
@@ -41,7 +36,7 @@ class ReportsController < ApplicationController
 
   def balance
     today = Date.today
-    @default_start_date = today - 90.days
+    @default_start_date = today - 180.days
     @default_end_date = today
   end
 
@@ -58,7 +53,7 @@ class ReportsController < ApplicationController
 
   def income_outgoings
     today = Date.today
-    @default_start_date = (today - 90.days).beginning_of_month
+    @default_start_date = (today - 180.days).beginning_of_month
     @default_end_date = today
   end
 
@@ -70,7 +65,7 @@ class ReportsController < ApplicationController
 
     builder = DataTableBuilder.new
     builder.column({ type: 'date', label: 'Date' }, dates.map{ |d| serialize_date(d) })
-    builder.number({ label: 'Income' }, dates.map{ |d| 1000 })
+    builder.number({ label: 'Income' }, dates.map{ |d| @project.sum_category('Income', d, params[:account_ids]) })
 
     render json: builder.build
   end
