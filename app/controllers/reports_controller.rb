@@ -65,11 +65,22 @@ class ReportsController < ApplicationController
 
     categories = @project.categories
 
-    income_by_month = dates.map do |date|
-      categories.map do |category|
+    income_by_month = []
+    spend_by_month = []
+
+    dates.each do |date|
+      income_for_month = 0
+      spend_for_month = 0
+      categories.each do |category|
         total = @project.sum_category(category, date, params[:account_ids])
-        total > 0 ? total : 0
-      end.reduce(:+)
+        if total > 0
+          income_for_month += total
+        else
+          spend_for_month += total
+        end
+      end
+      income_by_month << income_for_month
+      spend_by_month << spend_for_month
     end
 
     spend_by_month = dates.map do |date|
