@@ -78,6 +78,8 @@ private
     verifiable_transactions = transactions.select{ |t| t.categorized? }
     correct_transactions = verifiable_transactions.select { |t| t.assess_prediction == :correct }
 
+    byebug
+
     verifiable_amount = verifiable_transactions.map{ |t| t.value.abs }.reduce(:+)
     correct_amount = correct_transactions.map{ |t| t.value.abs }.reduce(:+)
 

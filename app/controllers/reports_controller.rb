@@ -62,41 +62,7 @@ class ReportsController < ApplicationController
     last_date = Date.parse(params[:to_date])
 
     dates = DateRange.new(first_date, last_date, true).to_a
-
-    categories = @project.categories
-
-    income_by_month = []
-    spend_by_month = []
-
-    dates.each do |date|
-      income_for_month = 0
-      spend_for_month = 0
-      categories.each do |category|
-        total = @project.sum_category(category, date, params[:account_ids])
-        if total > 0
-          income_for_month += total
-        else
-          spend_for_month += total
-        end
-      end
-      income_by_month << income_for_month
-      spend_by_month << spend_for_month
-    end
-
-    spend_by_month = dates.map do |date|
-      categories.map do |category|
-        total = @project.sum_category(category, date, params[:account_ids])
-        total < 0 ? total : 0
-      end.reduce(:+)
-    end
-
-    net_income_by_month = [income_by_month, spend_by_month].transpose.map(&:sum)
-
-    builder = DataTableBuilder.new
-    builder.column({ type: 'date', label: 'Date' }, dates.map{ |d| serialize_date(d) })
-    builder.number({ label: 'Income' }, income_by_month)
-    builder.number({ label: 'Spend' }, spend_by_month)
-    builder.number({ label: 'Net' }, net_income_by_month)
+    builder = IncomeOutgoingsReportBuilder.new(dates, @project, params[:account_ids])
 
     render json: builder.build
   end
