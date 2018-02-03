@@ -15,37 +15,27 @@ class PdfStatementParser
 
     previous_balance = nil
     new_balance = nil
-    lines = reader.pages.map { |page| page.text.split("\n").map{ |line| line.strip } }.flatten
+    @lines = reader.pages.map { |page| page.text.split("\n").map{ |line| line.strip } }.flatten
 
-    lines.each_with_index do |line, index|
-      match = PREV_BALANCE_REGEX.match(line)
-      if match
-        puts "Matched previous balance: #{line}"
-        previous_balance = BigDecimal.new(match[1].tr(',', ''))
-        lines.delete_at(index)
-        break
-      end
+    match_line(PREV_BALANCE_REGEX) do |match, line|
+      puts "Matched previous balance: #{line}"
+      previous_balance = BigDecimal.new(match[1].tr(',', ''))
     end
 
-    lines.each_with_index do |line, index|
-      match = NEW_BALANCE_REGEX.match(line)
-      if match
-        puts "Matched new balance: #{line}"
-        new_balance = BigDecimal.new(match[1].tr(',', ''))
-        lines.delete_at(index)
-        break
-      end
+    match_line(NEW_BALANCE_REGEX) do |match, line|
+      puts "Matched new balance: #{line}"
+      new_balance = BigDecimal.new(match[1].tr(',', ''))
     end
 
     date_range_start = nil
     date_range_end = nil
-    lines.each_with_index do |line, index|
+    @lines.each_with_index do |line, index|
       match = DATE_RANGE_SAME_YEAR.match(line)
       if match
         puts "Matched date range: #{line}"
         date_range_end = Date.parse(match[2])
         date_range_start = Date.parse("#{match[1]} #{date_range_end.year}")
-        lines.delete_at(index)
+        @lines.delete_at(index)
         break
       end
       match = DATE_RANGE_SPAN_YEARS.match(line)
@@ -53,7 +43,7 @@ class PdfStatementParser
         puts "Matched date range: #{line}"
         date_range_start = Date.parse(match[1])
         date_range_end = Date.parse(match[2])
-        lines.delete_at(index)
+        @lines.delete_at(index)
         break
       end
     end
@@ -71,7 +61,7 @@ class PdfStatementParser
     end
 
     current_balance = previous_balance
-    lines.each do |line|
+    @lines.each do |line|
       attrs = TransactionParser.new(line, date_range_start).parse
       if attrs
         current_balance += attrs[:value]
@@ -96,6 +86,19 @@ class PdfStatementParser
     end
 
     TransactionImporter.new(@account).import(candidate_transactions)
+  end
+
+private
+
+  def match_line(regex, &block)
+    @lines.each_with_index do |line, index|
+      match = regex.match(line)
+      if match
+        block.call(match, line)
+        @lines.delete_at(index)
+        break
+      end
+    end
   end
 
   class TransactionParser
@@ -138,7 +141,7 @@ class PdfStatementParser
       end
     end
 
-private
+  private
 
     def parse_value
       value = ''
