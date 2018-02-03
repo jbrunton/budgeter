@@ -12,10 +12,10 @@ class CurrentAccountParser
 
     validate(csv_data, header_map)
 
+    byebug
     candidate_transactions = csv_data.map do |row|
       @account.transactions.build({
         date: row[header_map['Date']],
-        transaction_type: row[header_map['Type']],
         description: row[header_map['Description']],
         value: row[header_map['Value']],
         balance: row[header_map['Balance']]
