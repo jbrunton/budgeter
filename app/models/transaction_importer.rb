@@ -3,28 +3,16 @@ class TransactionImporter
     @account = account
   end
 
-  def import(candidate_transactions)
+  def import(transactions)
     duplicate_transactions = []
     imported_transactions = []
-    candidate_transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
+    transactions.group_by{ |t| t.date }.each do |date, transactions_on_date|
       existing_transactions_on_date = @account.transactions.where(date: date)
       if existing_transactions_on_date.count > 0
-        duplicate_transactions_for_date = []
-        transactions_on_date.each do |t|
-          e = existing_transactions_on_date.select{ |e| e.sha == t.sha }.first
-          duplicate_transactions_for_date << e unless e.nil?
-        end
-        if duplicate_transactions_for_date.length > 0
-          if duplicate_transactions_for_date.count != existing_transactions_on_date.count
-            raise "Error: some duplicate transactions detected for #{date}"
-          end
-        end
-        duplicate_transactions.concat(transactions_on_date)
+        duplicate_transactions.concat duplicate_transactions_on_date(
+          date, existing_transactions_on_date, transactions_on_date)
       else
-        transactions_on_date.each_with_index do |t, index|
-          t.date_index = index
-          t.save
-        end
+        save_transactions(transactions_on_date)
         imported_transactions.concat(transactions_on_date)
       end
     end
@@ -33,5 +21,27 @@ class TransactionImporter
       imported_transactions: imported_transactions,
       duplicate_transactions: duplicate_transactions
     }
+  end
+
+private
+  def duplicate_transactions_on_date(date, existing_transactions, candidate_transactions)
+    duplicates = []
+    candidate_transactions.each do |t|
+      e = existing_transactions.select{ |e| e.sha == t.sha }.first
+      duplicates << e unless e.nil?
+    end
+    if duplicates.length > 0
+      if duplicates.count != existing_transactions.count
+        raise "Error: some duplicate transactions detected for #{date}"
+      end
+    end
+    duplicates
+  end
+
+  def save_transactions(transactions)
+    transactions.each_with_index do |t, index|
+      t.date_index = index
+      t.save
+    end
   end
 end
