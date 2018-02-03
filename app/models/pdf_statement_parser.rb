@@ -1,4 +1,4 @@
-class CreditCardParser
+class PdfStatementParser
   PREV_BALANCE_REGEX = /^BALANCE FROM PREVIOUS STATEMENT.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
   NEW_BALANCE_REGEX = /^NEW BALANCE.*£((?:\d{1,3},)*\d{1,3}\.\d{2})/
   DATE_RANGE_SPAN_YEARS = /^(\d{2} \p{L}+ \d{4}) - (\d{2} \p{L}+ \d{4})$/

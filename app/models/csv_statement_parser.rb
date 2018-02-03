@@ -1,6 +1,6 @@
 require 'CSV'
 
-class CurrentAccountParser
+class CsvStatementParser
   def initialize(account)
     @account = account
   end
@@ -12,7 +12,6 @@ class CurrentAccountParser
 
     validate(csv_data, header_map)
 
-    byebug
     candidate_transactions = csv_data.map do |row|
       @account.transactions.build({
         date: row[header_map['Date']],
