@@ -1,6 +1,8 @@
 require 'CSV'
 
 class CsvStatementParser
+  BALANCE_AT = /Balance as at/
+
   def initialize(account)
     @account = account
   end
@@ -19,6 +21,27 @@ class CsvStatementParser
         value: row[header_map['Value']],
         balance: row[header_map['Balance']]
       })
+    end
+
+    if @account.account_type == 'credit_card'
+      last_transaction = candidate_transactions.pop
+      if BALANCE_AT.match(last_transaction.description)
+        current_balance = last_transaction.balance
+        last_transaction.delete
+      else
+        raise "Error: expected last transaction to be the account balance."
+      end
+
+      candidate_transactions.reverse.each do |t|
+        t.balance = current_balance
+        current_balance -= t.value
+      end
+    else
+      candidate_transactions.each do |t|
+        if t.balance.nil?
+          raise "Error: expected balance for all transactions."
+        end
+      end
     end
 
     duplicate_transactions = []
