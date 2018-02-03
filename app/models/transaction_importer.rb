@@ -27,15 +27,23 @@ private
   def duplicate_transactions_on_date(date, existing_transactions, candidate_transactions)
     duplicates = []
     candidate_transactions.each do |t|
-      e = existing_transactions.select{ |e| e.sha == t.sha }.first
-      duplicates << e unless e.nil?
+      duplicate = find_duplicate(t, existing_transactions)
+      duplicates << duplicate unless duplicate.nil?
     end
+    validate_duplicates(duplicates, existing_transactions, date)
+    duplicates
+  end
+
+  def find_duplicate(transaction, existing_transactions)
+    existing_transactions.select{ |e| e.sha == transaction.sha }.first
+  end
+
+  def validate_duplicates(duplicates, existing_transactions, date)
     if duplicates.length > 0
       if duplicates.count != existing_transactions.count
         raise "Error: some duplicate transactions detected for #{date}"
       end
     end
-    duplicates
   end
 
   def save_transactions(transactions)
