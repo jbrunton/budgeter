@@ -29,36 +29,14 @@ class PdfStatementParser
 
     date_range_start = nil
     date_range_end = nil
-    @lines.each_with_index do |line, index|
-      match = DATE_RANGE_SAME_YEAR.match(line)
-      if match
-        puts "Matched date range: #{line}"
-        date_range_end = Date.parse(match[2])
-        date_range_start = Date.parse("#{match[1]} #{date_range_end.year}")
-        @lines.delete_at(index)
-        break
-      end
-      match = DATE_RANGE_SPAN_YEARS.match(line)
-      if match
-        puts "Matched date range: #{line}"
-        date_range_start = Date.parse(match[1])
-        date_range_end = Date.parse(match[2])
-        @lines.delete_at(index)
-        break
-      end
+
+    match_date_range do |start_date, end_date|
+      date_range_start = start_date
+      date_range_end = end_date
     end
 
-    if date_range_start.nil? || date_range_end.nil?
-      raise "Unable to parse date range."
-    end
-
-    if previous_balance.nil?
-      raise "Unable to parse previous balance."
-    end
-
-    if new_balance.nil?
-      raise "Unable to parse new balance."
-    end
+    validate_date_range(date_range_start, date_range_end)
+    validate_balances(previous_balance, new_balance)
 
     current_balance = previous_balance
     @lines.each do |line|
@@ -76,14 +54,7 @@ class PdfStatementParser
       raise "Error: computed new balance (#{current_balance}) != stated new balance (#{new_balance})"
     end
 
-    if date_range_start.year != date_range_end.year
-      candidate_transactions.each do |t|
-        # we're at the Dec-Jan cutover, so update years for Jan transactions
-        if t.date.month == 1
-          t.date = t.date.change(year: date_range_end.year)
-        end
-      end
-    end
+    check_dates(candidate_transactions, date_range_start, date_range_end)
 
     TransactionImporter.new(@account).import(candidate_transactions)
   end
@@ -97,6 +68,56 @@ private
         block.call(match, line)
         @lines.delete_at(index)
         break
+      end
+    end
+  end
+
+  def match_date_range(&block)
+    @lines.each_with_index do |line, index|
+      match = DATE_RANGE_SAME_YEAR.match(line)
+      if match
+        puts "Matched date range: #{line}"
+        end_date = Date.parse(match[2])
+        start_date = Date.parse("#{match[1]} #{start_date.year}")
+        block.call(start_date, end_date)
+        @lines.delete_at(index)
+        break
+      end
+      match = DATE_RANGE_SPAN_YEARS.match(line)
+      if match
+        puts "Matched date range: #{line}"
+        start_date = Date.parse(match[1])
+        end_date = Date.parse(match[2])
+        block.call(start_date, end_date)
+        @lines.delete_at(index)
+        break
+      end
+    end
+  end
+
+  def validate_date_range(date_range_start, date_range_end)
+    if date_range_start.nil? || date_range_end.nil?
+      raise "Unable to parse date range."
+    end
+  end
+
+  def validate_balances(previous_balance, new_balance)
+    if previous_balance.nil?
+      raise "Unable to parse previous balance."
+    end
+
+    if new_balance.nil?
+      raise "Unable to parse new balance."
+    end
+  end
+
+  def check_dates(candidate_transactions, date_range_start, date_range_end)
+    if date_range_start.year != date_range_end.year
+      candidate_transactions.each do |t|
+        # we're at the Dec-Jan cutover, so update years for Jan transactions
+        if t.date.month == 1
+          t.date = t.date.change(year: date_range_end.year)
+        end
       end
     end
   end
