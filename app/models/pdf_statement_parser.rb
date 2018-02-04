@@ -6,60 +6,42 @@ class PdfStatementParser
 
   def initialize(account)
     @account = account
+    @previous_balance = nil
+    @new_balance = nil
+    @date_range_start = nil
+    @date_range_end = nil
   end
 
   def parse(file)
     reader = PDF::Reader.new(file)
 
-    candidate_transactions = []
-
-    previous_balance = nil
-    new_balance = nil
     @lines = reader.pages.map { |page| page.text.split("\n").map{ |line| line.strip } }.flatten
 
-    match_line(PREV_BALANCE_REGEX) do |match, line|
-      puts "Matched previous balance: #{line}"
-      previous_balance = BigDecimal.new(match[1].tr(',', ''))
-    end
+    parse_balances
+    validate_balances
 
-    match_line(NEW_BALANCE_REGEX) do |match, line|
-      puts "Matched new balance: #{line}"
-      new_balance = BigDecimal.new(match[1].tr(',', ''))
-    end
+    parse_date_range
+    validate_date_range
 
-    date_range_start = nil
-    date_range_end = nil
-
-    match_date_range do |start_date, end_date|
-      date_range_start = start_date
-      date_range_end = end_date
-    end
-
-    validate_date_range(date_range_start, date_range_end)
-    validate_balances(previous_balance, new_balance)
-
-    current_balance = previous_balance
-    @lines.each do |line|
-      attrs = TransactionParser.new(line, date_range_start).parse
-      if attrs
-        current_balance += attrs[:value]
-        attrs[:balance] = current_balance
-        candidate_transactions << @account.transactions.build(attrs)
-      else
-        puts "Ignoring: " + line
-      end
-    end
-
-    if current_balance != new_balance
-      raise "Error: computed new balance (#{current_balance}) != stated new balance (#{new_balance})"
-    end
-
-    check_dates(candidate_transactions, date_range_start, date_range_end)
+    candidate_transactions = parse_transactions
+    check_dates(candidate_transactions)
 
     TransactionImporter.new(@account).import(candidate_transactions)
   end
 
 private
+
+  def parse_balances
+    match_line(PREV_BALANCE_REGEX) do |match, line|
+      puts "Matched previous balance: #{line}"
+      @previous_balance = BigDecimal.new(match[1].tr(',', ''))
+    end
+
+    match_line(NEW_BALANCE_REGEX) do |match, line|
+      puts "Matched new balance: #{line}"
+      @new_balance = BigDecimal.new(match[1].tr(',', ''))
+    end
+  end
 
   def match_line(regex, &block)
     @lines.each_with_index do |line, index|
@@ -72,43 +54,62 @@ private
     end
   end
 
-  def match_date_range(&block)
+  def parse_date_range
     match_line(DATE_RANGE_SAME_YEAR) do |match, line|
       puts "Matched date range: #{line}"
-      end_date = Date.parse(match[2])
-      start_date = Date.parse("#{match[1]} #{start_date.year}")
-      block.call(start_date, end_date)
+      @date_range_end = Date.parse(match[2])
+      @date_range_start = Date.parse("#{match[1]} #{start_date.year}")
     end
     match_line(DATE_RANGE_SPAN_YEARS) do |match, line|
       puts "Matched date range: #{line}"
-      start_date = Date.parse(match[1])
-      end_date = Date.parse(match[2])
-      block.call(start_date, end_date)
+      @date_range_start = Date.parse(match[1])
+      @date_range_end = Date.parse(match[2])
     end
   end
 
-  def validate_date_range(date_range_start, date_range_end)
-    if date_range_start.nil? || date_range_end.nil?
+  def validate_date_range
+    if @date_range_start.nil? || @date_range_end.nil?
       raise "Unable to parse date range."
     end
   end
 
-  def validate_balances(previous_balance, new_balance)
-    if previous_balance.nil?
+  def validate_balances
+    if @previous_balance.nil?
       raise "Unable to parse previous balance."
     end
 
-    if new_balance.nil?
+    if @new_balance.nil?
       raise "Unable to parse new balance."
     end
   end
 
-  def check_dates(candidate_transactions, date_range_start, date_range_end)
-    if date_range_start.year != date_range_end.year
+  def parse_transactions
+    candidate_transactions = []
+    current_balance = @previous_balance
+    @lines.each do |line|
+      attrs = TransactionParser.new(line, @date_range_start).parse
+      if attrs
+        current_balance += attrs[:value]
+        attrs[:balance] = current_balance
+        candidate_transactions << @account.transactions.build(attrs)
+      else
+        puts "Ignoring: " + line
+      end
+    end
+
+    if current_balance != @new_balance
+      raise "Error: computed new balance (#{current_balance}) != stated new balance (#{@new_balance})"
+    end
+
+    candidate_transactions
+  end
+
+  def check_dates(candidate_transactions)
+    if @date_range_start.year != @date_range_end.year
       candidate_transactions.each do |t|
         # we're at the Dec-Jan cutover, so update years for Jan transactions
         if t.date.month == 1
-          t.date = t.date.change(year: date_range_end.year)
+          t.date = t.date.change(year: @date_range_end.year)
         end
       end
     end
