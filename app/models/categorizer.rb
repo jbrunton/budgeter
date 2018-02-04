@@ -78,10 +78,8 @@ private
     verifiable_transactions = transactions.select{ |t| t.categorized? }
     correct_transactions = verifiable_transactions.select { |t| t.assess_prediction == :correct }
 
-    byebug
-
     verifiable_amount = verifiable_transactions.map{ |t| t.value.abs }.reduce(:+)
-    correct_amount = correct_transactions.map{ |t| t.value.abs }.reduce(:+)
+    correct_amount = correct_transactions.map{ |t| t.value.abs }.reduce(:+) || 0
 
     correct_transactions_score = (correct_transactions.count.to_f * 100 / verifiable_transactions.count).round
     correct_amount_score = (correct_amount * 100 / verifiable_amount).to_f.round

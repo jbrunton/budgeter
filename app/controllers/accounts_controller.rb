@@ -11,9 +11,9 @@ class AccountsController < ApplicationController
     ext = File.extname(upload.original_filename)
     case
       when ext == '.csv'
-        result = CurrentAccountParser.new(@account).parse(upload.tempfile)
+        result = CsvStatementParser.new(@account).parse(upload.tempfile)
       when ext == '.pdf'
-        result = CreditCardParser.new(@account).parse(upload.tempfile)
+        result = PdfStatementParser.new(@account).parse(upload.tempfile)
       else
         raise "Unsupported file extension."
     end
