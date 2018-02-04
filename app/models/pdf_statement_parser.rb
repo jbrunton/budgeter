@@ -165,20 +165,28 @@ private
   private
 
     def parse_value
-      value = ''
+      negative = parse_value_sign
+      value = parse_value_digits
+      value = '-' + value if negative
+      value.length > 0 ? value : nil
+    end
+
+    def parse_value_sign
       if @line.last == '-'
-        negative = true
         @line = @line[0..-2].strip
+        true
       else
-        negative = false
+        false
       end
+    end
+
+    def parse_value_digits
+      value = ''
       while DECIMAL_CHARS.include?(@line.last)
         value << @line.last unless @line.last == ','
         @line = @line[0..-2]
       end
-      value = value.reverse
-      value = '-' + value if negative
-      value.length > 0 ? value : nil
+      value.reverse
     end
 
     def parse_date
