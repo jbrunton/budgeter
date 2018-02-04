@@ -73,25 +73,17 @@ private
   end
 
   def match_date_range(&block)
-    @lines.each_with_index do |line, index|
-      match = DATE_RANGE_SAME_YEAR.match(line)
-      if match
-        puts "Matched date range: #{line}"
-        end_date = Date.parse(match[2])
-        start_date = Date.parse("#{match[1]} #{start_date.year}")
-        block.call(start_date, end_date)
-        @lines.delete_at(index)
-        break
-      end
-      match = DATE_RANGE_SPAN_YEARS.match(line)
-      if match
-        puts "Matched date range: #{line}"
-        start_date = Date.parse(match[1])
-        end_date = Date.parse(match[2])
-        block.call(start_date, end_date)
-        @lines.delete_at(index)
-        break
-      end
+    match_line(DATE_RANGE_SAME_YEAR) do |match, line|
+      puts "Matched date range: #{line}"
+      end_date = Date.parse(match[2])
+      start_date = Date.parse("#{match[1]} #{start_date.year}")
+      block.call(start_date, end_date)
+    end
+    match_line(DATE_RANGE_SPAN_YEARS) do |match, line|
+      puts "Matched date range: #{line}"
+      start_date = Date.parse(match[1])
+      end_date = Date.parse(match[2])
+      block.call(start_date, end_date)
     end
   end
 
