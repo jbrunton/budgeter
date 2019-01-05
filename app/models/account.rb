@@ -1,6 +1,6 @@
 class Account < ApplicationRecord
   belongs_to :project
-  has_many :transactions
+  has_many :transactions, -> { order 'date ASC' }
 
   TYPES = ['current', 'credit_card']
 
