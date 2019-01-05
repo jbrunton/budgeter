@@ -7,18 +7,24 @@ class AccountsController < ApplicationController
   end
 
   def upload_statement
-    upload = params[:statement]
-    ext = File.extname(upload.original_filename)
-    case
-      when ext == '.csv'
-        result = CsvStatementParser.new(@account).parse(upload.tempfile)
-      when ext == '.pdf'
-        result = PdfStatementParser.new(@account).parse(upload.tempfile)
-      else
-        raise "Unsupported file extension."
+    uploads = params[:statements]
+    total_imports = 0
+    total_duplicates = 0
+    uploads.each do |upload|
+      ext = File.extname(upload.original_filename)
+      case
+        when ext == '.csv'
+          result = CsvStatementParser.new(@account).parse(upload.tempfile)
+        when ext == '.pdf'
+          result = PdfStatementParser.new(@account).parse(upload.tempfile)
+        else
+          raise "Unsupported file extension."
+      end
+      total_imports += result[:imported_transactions].count
+      total_duplicates += result[:duplicate_transactions].count
     end
-    notice = "Imported #{result[:imported_transactions].count} transactions"
-    notice << " (#{result[:duplicate_transactions].count} duplicates)" if result[:duplicate_transactions].any?
+    notice = "Imported #{total_imports} transactions"
+    notice << " (#{total_duplicates} duplicates)" if total_duplicates > 0
     redirect_to account_transactions_path(@account), notice: notice
   end
 

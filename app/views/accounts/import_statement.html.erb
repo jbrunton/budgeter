@@ -3,7 +3,7 @@
 <h1>Import</h1>
 
 <%= form_tag({action: :upload_statement}, multipart: true) do %>
-    <%= file_field_tag 'statement' %>
+    <%= file_field_tag 'statements[]', multiple: true %>
     <br>
     <%= submit_tag('Upload', class: 'waves-effect waves-light btn') %>
 <% end %>
