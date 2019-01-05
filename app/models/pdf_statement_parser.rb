@@ -58,7 +58,7 @@ private
     match_line(DATE_RANGE_SAME_YEAR) do |match, line|
       puts "Matched date range: #{line}"
       @date_range_end = Date.parse(match[2])
-      @date_range_start = Date.parse("#{match[1]} #{start_date.year}")
+      @date_range_start = Date.parse("#{match[1]} #{@date_range_end.year}")
     end
     match_line(DATE_RANGE_SPAN_YEARS) do |match, line|
       puts "Matched date range: #{line}"
