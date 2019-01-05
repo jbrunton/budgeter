@@ -7,12 +7,6 @@ class StatementsController < ApplicationController
 
   def show
     @statement = Statement.new(@project, Date.parse(params[:date]))
-
-    first_date = @project.transactions.first.date.beginning_of_month
-    last_date = @project.transactions.last.date
-    @month_options = DateRange.new(first_date,last_date, true).to_a
-      .map{ |date| [date.strftime('%b %Y'), date.strftime('%Y-%m-%d')] }
-    @sort_options = [['Date', 'date'], ['Amount', 'amount']]
   end
 
   def transactions
