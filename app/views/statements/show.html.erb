@@ -136,11 +136,11 @@
   <div class="col s6">
     <form id="statement_options" class="row">
       <div class="input-field col s6">
-        <%= select_tag 'month', options_for_select(@month_options, @statement.date_key), id: 'month' %>
+        <%= select_tag 'month', options_for_select(month_options_for(@project), @statement.date_key), id: 'month' %>
         <label>Month</label>
       </div>
       <div class="input-field col s6">
-        <%= select_tag 'sort_by', options_for_select(@sort_options), id: 'sort_by' %>
+        <%= select_tag 'sort_by', options_for_select(tr_sort_options), id: 'sort_by' %>
         <label>Sort by</label>
       </div>
     </form>

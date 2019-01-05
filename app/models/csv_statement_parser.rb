@@ -9,7 +9,9 @@ class CsvStatementParser
 
   def parse(file)
     csv_data = CSV.read(file)
+    csv_data.shift
     header = csv_data.shift
+    csv_data.shift
     header_map = header.map{ |x| x.strip }.each_with_index.to_h
 
     validate_account(csv_data, header_map)

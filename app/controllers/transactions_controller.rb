@@ -2,15 +2,13 @@ class TransactionsController < ApplicationController
   before_action :set_transaction, only: [:show, :edit, :update, :destroy, :verify]
   before_action :set_account
 
+  include TransactionsHelper
+
   # GET /transactions
   # GET /transactions.json
   def index
     @project = @account.project
-    first_date = @account.transactions.first.date.beginning_of_month
-    last_date = @account.transactions.last.date
-    @month_options = DateRange.new(first_date,last_date, true).to_a
-      .map{ |date| [date.strftime('%b %Y'), date.strftime('%Y-%m-%d')] }
-    @sort_options = [['Date', 'date'], ['Amount', 'amount']]
+    @month_options = month_options_for(@project)
   end
 
   def statement

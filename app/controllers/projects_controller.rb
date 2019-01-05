@@ -20,11 +20,13 @@ class ProjectsController < ApplicationController
   def show
     @verification_state = @project.verification_state
 
-    charts_to_date = @project.transactions.last.date
-    charts_from_date = (charts_to_date - 90.days).beginning_of_month
-    chart_params = 'from_date=' + date_value(charts_from_date) +
-      '&to_date=' + date_value(charts_to_date) +
-      '&show_total=true';
+    unless @project.transactions.empty?
+      charts_to_date = @project.transactions.order('date').last.date
+      charts_from_date = (charts_to_date - 90.days).beginning_of_month
+      chart_params = 'from_date=' + date_value(charts_from_date) +
+        '&to_date=' + date_value(charts_to_date) +
+        '&show_total=true';
+    end
     chart_account_ids = @project.accounts.map{ |a| "account_ids[]=#{a.id}" }.join('&')
 
     @balance_chart_url = "#{project_path(@project)}/reports/balance_data/?#{chart_params}"
